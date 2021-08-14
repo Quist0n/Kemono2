@@ -100,3 +100,16 @@ Assuming the running setup:
     ```sh
     docker exec kemono-redis redis-cli FLUSHALL
     ```
+### __How do I git modules?__
+Assuming you haven't cloned the repo recursively for whatever reason:
+1. Initiate the submodules
+    ```sh
+    git submodule init
+    git submodule update --init --recursive
+    ```
+2. Switch to archiver folder and add your fork to the remotes list:
+    ```sh
+    cd archiver
+    git remote add <remote_name> <your_fork_link>
+    ```
+3. Now you can interact with Kitsune repo the same way you do as if it was outside of project folder.
