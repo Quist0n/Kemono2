@@ -1,8 +1,9 @@
+import { isLoggedIn } from "@wp/js/account";
+
 /**
  * @param {HTMLElement} header 
- * @param {SVGAnimatedBoolean} isLoggedIn 
  */
-export function initShell(header, isLoggedIn) {
+export function initShell(header) {
   const accButtons = header.querySelector("#account-buttons");
 
   // TODO: rewrite into without string literals

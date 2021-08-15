@@ -5,7 +5,10 @@ from ..lib.account import load_account
 from ..types.account import Account, account_roles
 from .admin_types import admin_props
 
-admin = Blueprint('admin', __name__)
+admin = Blueprint(
+    'admin', 
+    __name__
+)
 
 @admin.before_request
 def check_credentials():
@@ -18,7 +21,7 @@ def get_admin():
     props = admin_props.Dashboard()
 
     response = make_response(render_template(
-        'admin_dashboard.html',
+        'admin/dashboard.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -54,7 +57,7 @@ def get_accounts():
     )
 
     response = make_response(render_template(
-        'admin_accounts.html',
+        'admin/accounts.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -76,7 +79,7 @@ def search_accounts():
     )
 
     response = make_response(render_template(
-        'admin_accounts.html',
+        'admin/accounts.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -93,7 +96,7 @@ def get_account(account_id: str):
     )
 
     response = make_response(render_template(
-        'admin_account_info.html',
+        'admin/account_info.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -116,7 +119,7 @@ def get_account_files(account_id: str):
         files= files
     )
     response = make_response(render_template(
-        'admin_account_files.html',
+        'admin/account_files.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -132,7 +135,7 @@ def get_moderators_audits():
         actions= actions
     )
     response = make_response(render_template(
-        'admin_mods_actions.html',
+        'admin/mods_actions.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'

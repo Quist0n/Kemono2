@@ -18,7 +18,7 @@ from bleach.sanitizer import Cleaner
 
 account_create_lock = Lock()
 
-def load_account(account_id = None, reload = False):
+def load_account(account_id: str = None, reload: bool = False):
     if account_id is None and 'account_id' in session:
         return load_account(session['account_id'], reload)
     elif account_id is None and 'account_id' not in session:
@@ -29,7 +29,7 @@ def load_account(account_id = None, reload = False):
     account = redis.get(key)
     if account is None or reload:
         cursor = get_cursor()
-        query = 'select id, username, created_at, role from account where id = %s'
+        query = 'SELECT id, username, created_at, role FROM account WHERE id = %s'
         cursor.execute(query, (account_id,))
         account = cursor.fetchone()
         redis.set(key, serialize_account(account))
@@ -38,9 +38,9 @@ def load_account(account_id = None, reload = False):
 
     return account
 
-def get_login_info_for_username(username):
+def get_login_info_for_username(username: str):
     cursor = get_cursor()
-    query = 'select id, password_hash from account where username = %s'
+    query = 'SELECT id, password_hash FROM account WHERE username = %s'
     cursor.execute(query, (username,))
     return cursor.fetchone()
 
@@ -51,7 +51,7 @@ def is_logged_in():
 
 def is_username_taken(username):
     cursor = get_cursor()
-    query = 'select id from account where username = %s'
+    query = 'SELECT id FROM account WHERE username = %s'
     cursor.execute(query, (username,))
     return cursor.fetchone() is not None
 
@@ -66,12 +66,12 @@ def create_account(username, password, favorites):
         scrub = Cleaner(tags = [])
 
         cursor = get_cursor()
-        query = "insert into account (username, password_hash) values (%s, %s) returning id"
+        query = "INSERT into account (username, password_hash) values (%s, %s) returning id"
         cursor.execute(query, (scrub.clean(username), password_hash,))
         account_id = cursor.fetchone()['id']
         if (account_id == 1):
             cursor = get_cursor()
-            query = "update account set role = 'administrator' where id = 1"
+            query = "UPDATE account SET role = 'administrator' where id = 1"
             cursor.execute(query)
     finally:
         account_create_lock.release()
@@ -106,7 +106,7 @@ def attempt_login(username, password):
     flash('Username or password is incorrect')
     return False
 
-def get_base_password_hash(password):
+def get_base_password_hash(password: str):
     return base64.b64encode(hashlib.sha256(password.encode('utf-8')).digest())
 
 def serialize_account(account):
