@@ -1,8 +1,15 @@
+from ..internals.database.database import get_cursor
+
 def get_administrator():
     pass
 
 def get_accounts():
-    pass
+    cursor = get_cursor()
+    query = 'SELECT * FROM account'
+    cursor.execute(query)
+    accounts = cursor.fetchall()
+    
+    return accounts
 
 def search_accounts():
     pass

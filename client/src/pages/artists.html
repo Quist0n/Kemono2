@@ -72,7 +72,7 @@
       {% for user in results %}
         {{ user_card(user, is_count=true) }}
       {% else %}
-        <p class="subtitle">
+        <p class="subtitle card-list__item--no-results">
           No artists found for your query.
         </p>
       {% endfor %}

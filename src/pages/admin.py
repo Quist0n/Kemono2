@@ -1,7 +1,9 @@
 from flask import Blueprint, request, make_response, render_template, abort
 from datetime import datetime
 
+from ..lib.administrator import get_accounts
 from ..lib.account import load_account
+
 from ..types.account import Account, account_roles
 from .admin_types import admin_props
 
@@ -28,29 +30,8 @@ def get_admin():
     return response
 
 @admin.route('/admin/accounts', methods= ['GET'])
-def get_accounts():
-    accounts = [
-        Account(
-            id= '123',
-            username= 'literal_who',
-            created_at= datetime.now().isoformat(),
-            password= '123qwe'
-        ),
-        Account(
-            id= '456',
-            username= 'sp_watcher',
-            created_at= datetime.now().isoformat(),
-            password= 'mod4free',
-            role= 'moderator'
-        ),
-        Account(
-            id= '123456qwerty',
-            username= 'sp_watchers_watcher',
-            created_at= datetime.now().isoformat(),
-            password= 'kemonoAdmin',
-            role= 'administrator'
-        ),
-    ]
+def admin_accounts():
+    accounts = get_accounts()
     props = admin_props.Accounts(
         accounts= accounts,
         role_list= account_roles

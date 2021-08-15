@@ -1,4 +1,4 @@
-import { createComponent } from "./_index";
+import { createComponent } from "@wp/js/component-factory";
 import { ImageLink } from "./image_link";
 import { FancyLink } from "./links";
 import { Timestamp } from "./timestamp";
