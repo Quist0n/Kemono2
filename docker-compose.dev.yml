@@ -87,6 +87,7 @@ services:
       kemono-db:
         condition: service_healthy
     volumes:
+      - ./archiver:/app
       - ./kitsune.py:/app/config.py
       - data-dev:/storage
     sysctls:
