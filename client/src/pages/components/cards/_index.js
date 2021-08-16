@@ -1,7 +1,5 @@
 import { createComponent } from "@wp/js/component-factory";
-import { ImageLink } from "./image_link";
-import { FancyLink } from "./links";
-import { Timestamp } from "./timestamp";
+import { ImageLink, FancyLink, Timestamp } from "@wp/components";
 import { freesites, paysites } from "@wp/utils";
 
 /**
