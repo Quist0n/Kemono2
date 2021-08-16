@@ -33,21 +33,13 @@ interface Notification {
   created_at: Date | string
 }
 
-interface ModeratorAction {
+interface Action {
   id: string
   account_id: string
   type: string
   /**
    * A list of resource `id`s affected by the action.
    */
-  resources: string[]
-  created_at: Date | string
-}
-
-interface ModeratorTask {
-  id: string
-  account_id: string
-  resource_id: string
   created_at: Date | string
 }
 ```

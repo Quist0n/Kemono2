@@ -1,4 +1,12 @@
+import ujson
+import copy
+import bcrypt
+import base64
+import hashlib
+import dateutil
 from flask import session, current_app, flash
+from threading import Lock
+from bleach.sanitizer import Cleaner
 
 from ..internals.database.database import get_cursor
 from ..utils.utils import get_value
@@ -7,14 +15,8 @@ from ..lib.favorites import add_favorite_artist
 from ..lib.artist import get_artist
 from ..lib.security import is_login_rate_limited
 
-import ujson
-import copy
-import bcrypt
-import base64
-import hashlib
-import dateutil
-from threading import Lock
-from bleach.sanitizer import Cleaner
+from typing import Dict, List
+from ..types.account import Account
 
 account_create_lock = Lock()
 
@@ -123,4 +125,21 @@ def prepare_account_fields(account):
 
 def rebuild_account_fields(account):
     account['created_at'] = dateutil.parser.parse(account['created_at'])
+    return account
+
+def init_accounts_from_dict(accounts: List[Dict]) -> List[Account]:
+    for index, account in enumerate(accounts):
+        accounts[index] = init_account_from_dict(account)
+    
+    return accounts
+
+def init_account_from_dict(account: Dict) -> Account:
+    account = Account(
+        id=account["id"],
+        username=account["username"],
+        password=account["password"],
+        created_at=account["created_at"],
+        role=account["role"]
+    )
+
     return account

@@ -30,7 +30,7 @@ def get_admin():
     return response
 
 @admin.route('/admin/accounts', methods= ['GET'])
-def admin_accounts():
+def get_accounts_list():
     accounts = get_accounts()
     props = admin_props.Accounts(
         accounts= accounts,
@@ -45,7 +45,7 @@ def admin_accounts():
     return response
 
 @admin.route('/admin/accounts', methods= ['POST'])
-def change_accounts():
+def change_account_roles():
     pass
 
 @admin.route('/admin/accounts/search', methods= ['POST'])

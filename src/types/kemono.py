@@ -1,14 +1,19 @@
 from datetime import datetime
-from typing import Union, Optional
+from typing import Union, Optional, Tuple
 
 class Database_Entry:
     def __init__(self, 
-        id: str, 
-        created_at: Union[str, datetime]
+        id: str
     ) -> None:
-        id = id,
-        created_at = created_at
+        id = id
     
+    def from_db_query(self, query_result: Tuple):
+        """
+        Initialize off the DB query result.
+        """
+        entry = Database_Entry()
+        return entry
+
     def serialize():
         pass
 

@@ -11,7 +11,10 @@
     </h1>
   </header>
   {# presumably there is going to be a list of accounts #}
-  <form>
+  <form
+    id="account-list"
+    method="POST"
+  >
     {% call card_list('legacy') %}
       {% for account in props.accounts %}
         <div class="form__section">
