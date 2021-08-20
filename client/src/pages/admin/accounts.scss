@@ -1,10 +1,35 @@
+@use "../../css/variables.scss" as *;
+
 .site-section--admin-accounts {
   .account {
-    &__role {
-      text-align: center;
-      font-size: 1.2em;
-      font-weight: bold;
-      margin: 0 auto;
+    &__view {
+      position: relative;
+    }
+  
+    &__role-check {
+      position: absolute;
+      visibility: hidden;
+      opacity: 0;
+      
+      &:checked + .account__info {
+        --local-border-colour1: var(--colour0-secondary);
+      }
+    }
+  
+    &__info {
+      --local-border-colour1: var(--submit-colour1-primary);
+      border: $size-thin solid var(--local-border-colour1);
+      transition-duration: var(--duration-global);
+      transition-property: border-color;
+    }
+  
+    &__label {
+      border: $size-thin solid var(--local-border-colour1);
+
+      transition-duration: var(--duration-global);
+      transition-property: border-color;
+      &--promote {}
+      &--demote {}
     }
   }
 }

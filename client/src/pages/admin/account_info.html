@@ -1,5 +1,7 @@
 {% extends 'components/shell.html' %}
 
+{% from 'components/timestamp.html' import timestamp %}
+
 {% block content %}
 <section class="site-section site-section--admin-account-info">
   <header class="site-section__header">
@@ -7,5 +9,13 @@
       Account information for {{ props.account.username }} ({{ props.account.id }})
     </h1>
   </header>
+  <dl>
+    <div>
+      <dt>Created:</dt>
+      <dd>
+        {{ timestamp(props.account.created_at) }}
+      </dd>
+    </div>
+  </dl>
 </section>
 {% endblock content %}

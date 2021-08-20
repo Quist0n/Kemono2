@@ -1,4 +1,4 @@
-{% extends 'components/shell.html' %}
+{% extends 'admin/shell.html' %}
 
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/account.html' import account_card %}
@@ -10,45 +10,79 @@
       Accounts
     </h1>
   </header>
-  {# presumably there is going to be a list of accounts #}
+  {# <form 
+    id="accounts-filter"
+    class="form" 
+    action="/admin/accounts/search"
+    method="POST"
+  >
+    <div class="form__section">
+      <label 
+        for="accounts-filter__roles" class="form__label"
+      >
+        Roles:
+      </label>
+      <select 
+        id="accounts-filter__roles" 
+        class="form__select"
+        name="role" 
+      >
+        <option value="" class="form__option">All</option>
+        {% for role in props.role_list %}
+          <option
+            class="form__option"
+            value="{{ role }}"
+          >
+            {{ role }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form__section">
+      <button 
+        class="form__button form__button--submit" 
+        type="submit" 
+      >
+        Filter
+      </button>
+    </div>
+  </form> #}
   <form
     id="account-list"
     method="POST"
   >
     {% call card_list('legacy') %}
       {% for account in props.accounts %}
-        <div class="form__section">
-          {{ account_card(account) }}
-          {% if account.role != 'administrator' %}
-            <label for="role-{{ account.id }}">
-              Switch role:
-            </label>
-            <select 
-              id="role-{{ account.id }}"
-              class="form__select"
-              name="{{ account.id }}" 
-              {% if account.role == 'administrator' %}
-                disabled
-              {% endif %}
+        {% if account.role == 'moderator' %}
+          <div class="form__section account__view">
+            <input 
+              type="checkbox" 
+              name="moderator" 
+              id="account-{{ account.id }}" 
+              class="form__input account__role-check"
             >
-              {% for role in props.role_list %}
-                <option
-                  class="form__option"
-                  value="{{ role }}"
-                  {% if role == account.role %}
-                    selected
-                  {% endif %}
-                >
-                  {{ role }}
-                </option>
-              {% endfor %}
-            </select>
-          {% else %}
-            <p class="account__role">
-              {{ account.role }}
-            </p>
-          {% endif %}
-        </div>
+            <div class="account__info">
+              {{ account_card(account) }}
+              <label for="account-{{ account.id }}" class="form__label account__label account__label--demote">Demote</label>
+            </div>
+            
+          </div>
+        {% elif account.role == 'consumer'%}
+          <div class="form__section">
+            <input 
+              type="checkbox" 
+              name="consumer" 
+              id="account-{{ account.id }}" 
+              class="form__input account__role-check"
+            >
+            <div class="account__info">
+              {{ account_card(account) }}
+              <label for="account-{{ account.id }}" class="form__label account__label account__label--promote">Promote</label>
+            </div>
+            
+          </div>
+        {% else %}
+        {% endif %}
       {% else %}
         <p>No accounts found.</p>
       {% endfor %}

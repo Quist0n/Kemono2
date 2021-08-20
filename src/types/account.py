@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, Union
-from packaging.version import parse as parse_version
+# from packaging.version import parse as parse_version
 
 account_roles = ['consumer', 'moderator', 'administrator']
 
@@ -30,13 +30,13 @@ class Account:
     def __init__(self, 
         id: str,
         username: str,
-        password: str,
         created_at: datetime,
-        role: str = 'consumer'
+        password_hash: Optional[str],
+        role: str = 'consumer',
     ) -> None:
         self.id = id
         self.username = username
-        self.password = password
+        self.password_hash = password_hash if password_hash else None
         self.created_at = created_at
         self.role = role if role else 'consumer'
 
@@ -44,28 +44,28 @@ class Moderator(Account):
     def __init__(self, 
         id: str, 
         username: str, 
-        password: str, 
+        password_hash: str, 
         created_at: datetime,
     ) -> None:
         super().__init__(
             id, 
             username, 
-            password, 
+            password_hash, 
             created_at, 
             role='moderator'
         )
 
-class Adminstrator(Account):
+class Administrator(Account):
     def __init__(self, 
         id: str, 
         username: str, 
-        password: str, 
+        password_hash: str, 
         created_at: datetime
     ) -> None:
         super().__init__(
             id, 
             username, 
-            password, 
+            password_hash, 
             created_at, 
             role='administrator'
         )

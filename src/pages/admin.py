@@ -1,7 +1,7 @@
 from flask import Blueprint, request, make_response, render_template, abort
 from datetime import datetime
 
-from ..lib.administrator import get_accounts
+from ..lib.administrator import demote_moderators_to_consumers, get_account, get_accounts, promote_consumers_to_moderators
 from ..lib.account import load_account
 
 from ..types.account import Account, account_roles
@@ -46,78 +46,99 @@ def get_accounts_list():
 
 @admin.route('/admin/accounts', methods= ['POST'])
 def change_account_roles():
-    pass
+    accounts = {
+        "moderator": [],
+        "consumer": []
+    }
+    for account_id, role in request.form:
+        if role in account_roles and role != "administrator":
+            accounts[role].append(account_id)
 
-@admin.route('/admin/accounts/search', methods= ['POST'])
-def search_accounts():
-    """
-    Search results for accounts.
-    """
-    accounts = []
-    props = admin_props.Accounts(
-        accounts= accounts,
-        role_list= account_roles
-    )
+    # promote_consumers_to_moderators(accounts["consumer"])
+    # demote_moderators_to_consumers(accounts["moderator"])
 
+    props = {
+        'currentPage': 'admin'
+    }
     response = make_response(render_template(
-        'admin/accounts.html',
-        props = props,
+        'success.html',
+        props = props
     ), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
+    response.headers['Cache-Control'] = 'max-age=0, private, must-revalidate'
+
     return response
 
-@admin.route('/admin/accounts/<account_id>', methods= ['GET'])
-def get_account(account_id: str):
-    """
-    Detailed account page.
-    """
-    account = {}
-    props = admin_props.Account(
-        account= account
-    )
+# @admin.route('/admin/accounts/search', methods= ['POST'])
+# def search_accounts():
+#     """
+#     Search results for accounts.
+#     """
+#     accounts = []
+#     props = admin_props.Accounts(
+#         accounts= accounts,
+#         role_list= account_roles
+#     )
 
-    response = make_response(render_template(
-        'admin/account_info.html',
-        props = props,
-    ), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
-    return response
+#     response = make_response(render_template(
+#         'admin/accounts.html',
+#         props = props,
+#     ), 200)
+#     response.headers['Cache-Control'] = 's-maxage=60'
+#     return response
 
-@admin.route('/admin/accounts/<account_id>', methods= ['POST'])
-def change_account():
-    pass
+# @admin.route('/admin/accounts/<account_id>', methods= ['GET'])
+# def get_account_info(account_id: str):
+#     """
+#     Detailed account page.
+#     """
+#     account = get_account(account_id)
+#     props = admin_props.Account(
+#         account= account
+#     )
 
-@admin.route('/admin/accounts/<account_id>/files')
-def get_account_files(account_id: str):
-    """
-    The lists of approved/rejected/queued files for the given account.
-    """
-    files = []
-    account = {}
+#     response = make_response(render_template(
+#         'admin/account_info.html',
+#         props = props,
+#     ), 200)
+#     response.headers['Cache-Control'] = 's-maxage=60'
+#     return response
 
-    props = admin_props.Account_Files(
-        account= account,
-        files= files
-    )
-    response = make_response(render_template(
-        'admin/account_files.html',
-        props = props,
-    ), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
-    return response
+# @admin.route('/admin/accounts/<account_id>', methods= ['POST'])
+# def change_account():
+#     pass
 
-@admin.route('/admin/mods/actions', methods= ['GET'])
-def get_moderators_audits():
-    """
-    The list of moderator actions.
-    """
-    actions = []
-    props = admin_props.ModeratorActions(
-        actions= actions
-    )
-    response = make_response(render_template(
-        'admin/mods_actions.html',
-        props = props,
-    ), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
-    return response
+# @admin.route('/admin/accounts/<account_id>/files')
+# def get_account_files(account_id: str):
+#     """
+#     The lists of approved/rejected/queued files for the given account.
+#     """
+#     files = []
+#     account = {}
+
+#     props = admin_props.Account_Files(
+#         account= account,
+#         files= files
+#     )
+#     response = make_response(render_template(
+#         'admin/account_files.html',
+#         props = props,
+#     ), 200)
+#     response.headers['Cache-Control'] = 's-maxage=60'
+#     return response
+
+# @admin.route('/admin/mods/actions', methods= ['GET'])
+# def get_moderators_audits():
+#     """
+#     The list of moderator actions.
+#     """
+#     actions = []
+#     props = admin_props.ModeratorActions(
+#         actions= actions
+#     )
+#     response = make_response(render_template(
+#         'admin/mods_actions.html',
+#         props = props,
+#     ), 200)
+#     response.headers['Cache-Control'] = 's-maxage=60'
+#     return response
+    
