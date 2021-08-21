@@ -21,7 +21,7 @@ const pagePlugins = buildHTMLWebpackPluginsRecursive(pagesPath, {
 const webpackConfig = {
   entry: {
     global: path.join(projectPath, "js", "global.js"),
-    // admin: path.join(projectPath, "js", "admin.js"),
+    admin: path.join(projectPath, "js", "admin.js"),
     // moderator: path.join(projectPath, "js", "moderator.js"),
   },
   plugins: [
