@@ -10,13 +10,17 @@
       Accounts
     </h1>
   </header>
-  {# <form 
+  <form 
     id="accounts-filter"
     class="form" 
     action="/admin/accounts/search"
     method="POST"
   >
     <div class="form__section">
+      <label for="search-name" class="form__label">Name:</label>
+      <input type="text" name="name" id="search-name" class="form__input">
+    </div>
+    {# <div class="form__section">
       <label 
         for="accounts-filter__roles" class="form__label"
       >
@@ -37,16 +41,16 @@
           </option>
         {% endfor %}
       </select>
-    </div>
+    </div> #}
     <div class="form__section">
       <button 
         class="form__button form__button--submit" 
         type="submit" 
       >
-        Filter
+        Search
       </button>
     </div>
-  </form> #}
+  </form>
   <form
     id="account-list"
     method="POST"
@@ -54,7 +58,7 @@
     {% call card_list('legacy') %}
       {% for account in props.accounts %}
         {% if account.role == 'moderator' %}
-          <div class="form__section account__view">
+          <div class="form__section account__view account__view--demote">
             <input 
               type="checkbox" 
               name="moderator" 
@@ -63,12 +67,15 @@
             >
             <div class="account__info">
               {{ account_card(account) }}
-              <label for="account-{{ account.id }}" class="form__label account__label account__label--demote">Demote</label>
+              <label 
+                for="account-{{ account.id }}" 
+                class="form__label account__label"
+              >Demote</label>
             </div>
             
           </div>
         {% elif account.role == 'consumer'%}
-          <div class="form__section">
+          <div class="form__section account__view account__view--promote">
             <input 
               type="checkbox" 
               name="consumer" 
@@ -77,7 +84,10 @@
             >
             <div class="account__info">
               {{ account_card(account) }}
-              <label for="account-{{ account.id }}" class="form__label account__label account__label--promote">Promote</label>
+              <label 
+                for="account-{{ account.id }}" 
+                class="form__label account__label"
+              >Promote</label>
             </div>
             
           </div>
@@ -87,14 +97,16 @@
         <p>No accounts found.</p>
       {% endfor %}
     {% endcall %}
-    <div class="form__section">
-      <button 
-        class="form__button form__button--submit"
-        type="submit"
-      >
-        Submit
-      </button>
-    </div>
+    {% if props.accounts | length %}
+      <div class="form__section">
+        <button 
+          class="form__button form__button--submit"
+          type="submit"
+        >
+          Submit
+        </button>
+      </div>
+    {% endif %}
   </form>
 </section>
 {% endblock content %}
