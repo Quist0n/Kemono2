@@ -46,16 +46,17 @@ def get_accounts_list():
 
 @admin.route('/admin/accounts', methods= ['POST'])
 def change_account_roles():
-    accounts = {
+    print(request.form)
+    candidates = {
         "moderator": [],
         "consumer": []
     }
-    for account_id, role in request.form:
+    for role, account_id in request.form:
         if role in account_roles and role != "administrator":
-            accounts[role].append(account_id)
+            candidates[role].append(account_id)
 
-    # promote_consumers_to_moderators(accounts["consumer"])
-    # demote_moderators_to_consumers(accounts["moderator"])
+    # promote_consumers_to_moderators(candidates["consumer"])
+    # demote_moderators_to_consumers(candidates["moderator"])
 
     props = {
         'currentPage': 'admin'

@@ -61,9 +61,10 @@
           <div class="form__section account__view account__view--demote">
             <input 
               type="checkbox" 
-              name="moderator" 
+              name="consumer" 
               id="account-{{ account.id }}" 
               class="form__input account__role-check"
+              value="{{ account.id }}"
             >
             <div class="account__info">
               {{ account_card(account) }}
@@ -78,9 +79,10 @@
           <div class="form__section account__view account__view--promote">
             <input 
               type="checkbox" 
-              name="consumer" 
+              name="moderator" 
               id="account-{{ account.id }}" 
               class="form__input account__role-check"
+              value="{{ account.id }}"
             >
             <div class="account__info">
               {{ account_card(account) }}
