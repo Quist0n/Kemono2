@@ -65,7 +65,10 @@
 
     {% block bundler_output %}
       {# quick hack until writing proper loader #}
-      <%= htmlWebpackPlugin.tags.headTags %>
+      <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[0] %>">
+      <script src="<%= htmlWebpackPlugin.files.js[0] %>" defer></script>
+      <script src="<%= htmlWebpackPlugin.files.js[1] %>" defer></script>
+      <script src="<%= htmlWebpackPlugin.files.js[2] %>" defer></script>
     {% endblock bundler_output %}
 
     {% block scripts_extra %}
