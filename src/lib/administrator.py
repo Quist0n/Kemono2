@@ -16,10 +16,12 @@ def get_account(account_id: str) -> Account:
 
     return account
 
-def get_accounts() -> List[Account]:
+def get_accounts(offset: int, limit = None) -> List[Account]:
+    if limit is None:
+        limit = 25
     cursor = get_cursor()
-    query = 'SELECT * FROM account'
-    cursor.execute(query)
+    query = 'SELECT * FROM account OFFSET %s LIMIT %s;'
+    cursor.execute(query, (offset, limit))
     accounts = cursor.fetchall()
     accounts = init_accounts_from_dict(accounts)
 
@@ -43,7 +45,7 @@ def demote_moderators_to_consumers(account_ids: List[str]):
     query += 'SET role = \'consumer\' '
     query += 'WHERE '
     cursor.execute(query)
-    
+
     return
 
 def get_moderator_actions():
