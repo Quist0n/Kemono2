@@ -1,37 +1,37 @@
-from ..internals.database.database import get_cursor
-from ..lib.account import get_base_password_hash, is_username_taken
+import string
 
+from random import Random
 from datetime import datetime
-import bcrypt
-import hashlib
 
+# from configs.constants import test_path
 
-def generate_creds() -> dict[str, str]:
-    seed = datetime.now().isoformat()
-    username = seed + " " + get_base_password_hash(seed)
-    password = seed
-    return {'username': username, 'password': password}
+from typing import Dict, List
 
+acc_random = Random('Sneed')
+username_vocabulary = string.ascii_letters + string.digits
+password_vocabulary = string.ascii_letters + string.digits + string.punctuation
 
-def make_test_account() -> bool:
+def make_test_accounts() -> List[Dict]:
+    accounts = [generate_creds() for item in range(1000)]
+    
+    return accounts
 
-    creds = generate_creds()
-    username = creds.get('username')
-    password = creds.get('password')
+def generate_creds() -> Dict[str, str]:
+    user = {
+        'username': generate_random_string(5, 20, username_vocabulary, acc_random),
+        'password': generate_random_string(10, 255, password_vocabulary, acc_random)
+    }
+    return user
 
-    if is_username_taken():
-        return False
-    try:
-        cursor = get_cursor()
-        query = "INSERT INTO account (username, password_hash, role) values (%s, %s, 'tester');"
-        password = bcrypt.hashpw(get_base_password_hash(password), bcrypt.gensalt()).decode('utf-8')
-        cursor.execute(query, (username, password))
-        return True
-    except:
-        return False
+def generate_random_string(min_length: int, max_length: int, vocabulary: str, random: Random = acc_random) -> str:
+    string_length = random.randint(min_length, max_length)
+    result_string = ''.join(random.choice(vocabulary) for char in range(string_length))
 
-def make_test_accounts(count:int) -> None:
-    i = 0
-    while i < count:
-        make_test_account()
-        i += 1
+    return result_string
+
+def create_accounts_json(accounts: List[Dict]) -> None:
+    pass
+
+test_accounts = make_test_accounts()
+print(test_accounts[0], test_accounts[1], test_accounts[2])
+    
