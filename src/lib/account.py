@@ -18,6 +18,8 @@ from ..lib.security import is_login_rate_limited
 from typing import Dict, List
 from ..types.account import Account
 
+from typing import Dict, List, Optional
+
 account_create_lock = Lock()
 
 def load_account(account_id: str = None, reload: bool = False):
@@ -57,7 +59,7 @@ def is_username_taken(username):
     cursor.execute(query, (username,))
     return cursor.fetchone() is not None
 
-def create_account(username, password, favorites):
+def create_account(username: str, password: str, favorites: Optional[List[Dict]] = None) -> bool:
     account_id = None
     password_hash = bcrypt.hashpw(get_base_password_hash(password), bcrypt.gensalt()).decode('utf-8')
     account_create_lock.acquire()

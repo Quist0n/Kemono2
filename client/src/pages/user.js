@@ -3,7 +3,7 @@ import { CardList, PostCard, showTooltip, registerMessage } from "@wp/components
 import { createComponent } from "@wp/js/component-factory";
 import { isLoggedIn } from "@wp/js/account";
 
-/** 
+/**
  * @param {HTMLElement} section
  */
 export async function userPage(section) {
@@ -20,9 +20,9 @@ export async function userPage(section) {
 }
 
 /**
- * @param {HTMLElement} panelElement 
- * @param {string} artistID 
- * @param {string} artistService 
+ * @param {HTMLElement} panelElement
+ * @param {string} artistID
+ * @param {string} artistService
  */
 async function initButtons(panelElement, artistID, artistService) {
   /**
@@ -44,7 +44,7 @@ async function initButtons(panelElement, artistID, artistService) {
 }
 
 /**
- * @param {HTMLElement} cardListElement 
+ * @param {HTMLElement} cardListElement
  */
 async function initCardList(cardListElement) {
   const { cardItems } = CardList(cardListElement);
@@ -75,7 +75,7 @@ function handleFavouriting(id, service) {
       showTooltip(button, registerMessage(null, "Favorites"));
       return;
     }
-    
+
     const [icon, text] = button.children;
     /**
      * @type {HTMLElement}
@@ -85,7 +85,7 @@ function handleFavouriting(id, service) {
     button.disabled = true;
     button.classList.add("user-header__favourite--loading");
     button.insertBefore(loadingIcon, text);
-    
+
     try {
       if (button.classList.contains("user-header__favourite--unfav")) {
         const isRemoved = await removeFavouriteArtist(id, service);
@@ -95,7 +95,7 @@ function handleFavouriting(id, service) {
           icon.textContent = "☆";
           text.textContent = "Favorite";
         }
-        
+
       } else {
         const isAdded = await addFavouriteArtist(id, service);
 
@@ -107,13 +107,13 @@ function handleFavouriting(id, service) {
 
       }
     } catch (error) {
-      alert(error);
-      
+      console.error(error);
+
     } finally {
       loadingIcon.remove();
       button.disabled = false;
       button.classList.remove("user-header__favourite--loading");
     }
-    
+
   }
 }
