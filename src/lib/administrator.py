@@ -1,4 +1,5 @@
 from ..internals.database.database import get_cursor
+from ..lib.pagination import Pagination
 from ..lib.account import init_account_from_dict, init_accounts_from_dict
 
 from typing import List
@@ -16,12 +17,10 @@ def get_account(account_id: str) -> Account:
 
     return account
 
-def get_accounts(offset: int, limit = None) -> List[Account]:
-    if limit is None:
-        limit = 25
+def get_accounts(pagination: Pagination) -> List[Account]:
     cursor = get_cursor()
     query = 'SELECT * FROM account OFFSET %s LIMIT %s;'
-    cursor.execute(query, (offset, limit))
+    cursor.execute(query, (pagination.offset, pagination.limit))
     accounts = cursor.fetchall()
     accounts = init_accounts_from_dict(accounts)
 

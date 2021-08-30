@@ -5,6 +5,7 @@ from ..utils.utils import limit_int
 
 from ..lib.administrator import demote_moderators_to_consumers, get_account, get_accounts, promote_consumers_to_moderators
 from ..lib.account import load_account
+from ..lib.pagination import Pagination
 
 from ..types.account import Account, account_roles
 from .admin_types import admin_props
@@ -33,13 +34,12 @@ def get_admin():
 
 @admin.route('/admin/accounts', methods= ['GET'])
 def get_accounts_list():
-    offset = int(request.args.get('o') or 0)
-    limit = limit_int(int(request.args.get('limit') or 25), 50)
-
-    accounts = get_accounts(offset, limit = limit)
+    pagination = Pagination(request)
+    accounts = get_accounts(pagination)
     props = admin_props.Accounts(
         accounts= accounts,
-        role_list= account_roles
+        role_list= account_roles,
+        pagination= pagination
     )
 
     response = make_response(render_template(
@@ -147,4 +147,3 @@ def change_account_roles():
 #     ), 200)
 #     response.headers['Cache-Control'] = 's-maxage=60'
 #     return response
-

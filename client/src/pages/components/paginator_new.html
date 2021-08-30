@@ -1,0 +1,88 @@
+{% macro paginator(request, pagination, class_name= none) %}
+  {% set skip = pagination.offset %}
+  {% set current_page = pagination.current_page %}
+  {% set previous_page = '' %}
+  {% set next_page = '' %}
+  {% set rng = range(current_page - 2, current_page + 3) if skip >= pagination.limit else range(0, 7) %}
+
+  <div class="paginator {{ class_name if class_name }}">
+    <small class="paginator__count">
+      Showing {{ skip + 1 }} - {{ skip + pagination.limit }} of {{ pagination.count }}
+    </small>
+    <ul class="paginator__pages">
+      <li class="paginator__page">
+        <a 
+          class="paginator__link"
+          href="{{ url_for(request.endpoint, o = 0, **pagination.base) }}" 
+        >
+          1
+        </a>
+      </li>
+
+      {% if skip >= pagination.limit %}
+        <li class="paginator__page">
+          <a 
+            class="paginator__link"
+            href="{{ url_for(request.endpoint, o = skip - pagination.limit, **pagination.base) }}" 
+            title="Previous page"
+          >
+            First
+          </a>
+        </li>
+      {% else %}
+        <li class="subtitle">&lt;</li>
+      {% endif %}
+
+      {% if skip >= 100 %}
+        <li>
+          <a href="{{ url_for(request.endpoint, o = 0, **pagination.base) }}">
+            1
+          </a>
+        </li>
+        <li>...</li>
+      {% endif %}
+
+      {% for page in rng %}
+        {% if pagination.count > page * pagination.limit %}
+          {% if page * pagination.limit == skip %}
+            <li>{{ page + 1 }}</li>
+          {% else %}
+            <li>
+              <a 
+                href="{{ url_for(request.endpoint, o = page * pagination.limit, **pagination.base) }}"
+              >
+                {{ page + 1 }}
+              </a>
+            </li>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      {% for page in range(0, current_page) %}
+        {% if loop.last and pagination.count - skip >= 100 and pagination.count > 175 %}
+          <li>...</li>
+          <li>
+            <a 
+              href="{{ url_for(request.endpoint, o = page * pagination.limit, **pagination.base) }}"
+            >
+              {{ (pagination.count / pagination.limit)|round(0, 'ceil')|int }}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if pagination.count - skip > pagination.limit %}
+        <li>
+          <a 
+            href="{{ url_for(request.endpoint, o = skip + pagination.limit, **pagination.base) }}" 
+            title="Next page"
+          >
+            &gt;
+          </a>
+        </li>
+      {% else %}
+        <li class="subtitle">&gt;</li>
+      {% endif %}
+    </ul>
+  </div>
+{% endmacro %}
