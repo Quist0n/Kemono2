@@ -36,6 +36,9 @@ def get_admin():
 def get_accounts_list():
     pagination = Pagination(request)
     accounts = get_accounts(pagination)
+
+    pagination.add_count(len(accounts))
+
     props = admin_props.Accounts(
         accounts= accounts,
         role_list= account_roles,

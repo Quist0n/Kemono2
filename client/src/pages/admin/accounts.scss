@@ -46,13 +46,16 @@
       --local-background-colour1: var(--colour1-tertiary);
       --local-border-colour1: var(--colour1-tertiary);
 
+      max-width: var(--card-size);
+      height: 100%;
+      border-radius: 10px;
       border: $size-thin solid var(--local-border-colour1);
       overflow: hidden;
-      border-radius: 10px;
       transition-duration: var(--duration-global);
       transition-property: border-color;
 
       & .account-card {
+        height: 100%;
         border-radius: 0;
       }
     }
