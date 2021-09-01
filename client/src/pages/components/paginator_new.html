@@ -1,12 +1,10 @@
 {% macro paginator(request, pagination, class_name= none) %}
   {% set skip = pagination.offset %}
   {% set current_page = pagination.current_page %}
-  {% set previous_page = '' %}
-  {% set next_page = '' %}
 
   <div class="paginator {{ class_name if class_name }}">
     <small class="paginator__count">
-      Showing {{ skip + 1 }} - {{ skip + pagination.limit }} of {{ pagination.count }}
+      Showing {{ skip + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
     </small>
     <ul class="paginator__pages">
       <li class="paginator__page">

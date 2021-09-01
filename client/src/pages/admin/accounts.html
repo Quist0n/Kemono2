@@ -19,7 +19,15 @@
   >
     <div class="form__section">
       <label for="search-name" class="form__label">Name:</label>
-      <input type="text" name="name" id="search-name" class="form__input">
+      <input 
+        id="search-name" 
+        class="form__input"
+        type="text" 
+        name="name" 
+        {% if request.form.get('name') %}
+          value="{{ request.form.get('name') }}"
+        {% endif %}
+      >
     </div>
     {# <div class="form__section">
       <label 
