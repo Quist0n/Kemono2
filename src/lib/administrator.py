@@ -31,21 +31,27 @@ def search_accounts():
 
 def promote_consumers_to_moderators(account_ids: List[str]):
     cursor = get_cursor()
-    query = 'UPDATE account '
-    query += 'SET role = \'moderator\' '
-    query += 'WHERE '
-    cursor.execute(query)
+    query = """
+        UPDATE account 
+        SET role = \'moderator\' 
+        WHERE id = ANY (%s) 
+        ;
+        """
+    cursor.execute(query, (account_ids,))
 
-    return
+    return True
 
 def demote_moderators_to_consumers(account_ids: List[str]):
     cursor = get_cursor()
-    query = 'UPDATE account '
-    query += 'SET role = \'consumer\' '
-    query += 'WHERE '
-    cursor.execute(query)
+    query = """
+        UPDATE account 
+        SET role = \'consumer\' 
+        WHERE id = ANY (%s) 
+        ;
+        """
+    cursor.execute(query, (account_ids,))
 
-    return
+    return True
 
 def get_moderator_actions():
     pass
