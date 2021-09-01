@@ -139,7 +139,6 @@ def init_account_from_dict(account: Dict) -> Account:
     account = Account(
         id=account["id"],
         username=account["username"],
-        password_hash=account["password_hash"],
         created_at=account["created_at"],
         role=account["role"]
     )

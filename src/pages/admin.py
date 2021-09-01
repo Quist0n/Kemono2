@@ -1,9 +1,10 @@
+from typing import List
 from flask import Blueprint, request, make_response, render_template, abort
 from datetime import datetime
 
 from ..utils.utils import limit_int
 
-from ..lib.administrator import demote_moderators_to_consumers, get_account, get_accounts, promote_consumers_to_moderators
+from ..lib.administrator import demote_moderators_to_consumers, get_account, get_accounts, promote_consumers_to_moderators, search_accounts
 from ..lib.account import load_account
 from ..lib.pagination import Pagination
 
@@ -56,14 +57,15 @@ def get_accounts_list():
 def change_account_roles():
     form_dict = request.form.to_dict(flat=False)
     candidates = {
-        "moderator": form_dict.get('moderator'),
-        "consumer": form_dict.get('consumer')
+        "moderator": convert_ids_to_int(form_dict.get('moderator')),
+        "consumer": convert_ids_to_int(form_dict.get('consumer'))
     }
-    print(type(candidates["moderator"][0]))
+    
     are_promoted = promote_consumers_to_moderators(candidates["moderator"])
     are_demoted = demote_moderators_to_consumers(candidates["consumer"])
     props = {
-        'currentPage': 'admin'
+        'currentPage': 'admin',
+        'redirect': f"/admin/accounts"
     }
 
     response = make_response(render_template(
@@ -74,23 +76,27 @@ def change_account_roles():
 
     return response
 
-# @admin.route('/admin/accounts/search', methods= ['POST'])
-# def search_accounts():
-#     """
-#     Search results for accounts.
-#     """
-#     accounts = []
-#     props = admin_props.Accounts(
-#         accounts= accounts,
-#         role_list= account_roles
-#     )
+@admin.route('/admin/accounts/search', methods= ['POST'])
+def account_search():
+    """
+    Search results for accounts.
+    """
+    name = request.form.get('name')
+    pagination = Pagination(request)
+    accounts = search_accounts(pagination, name)
+    pagination.add_count(len(accounts))
+    props = admin_props.Accounts(
+        accounts= accounts,
+        pagination= pagination,
+        role_list= account_roles
+    )
 
-#     response = make_response(render_template(
-#         'admin/accounts.html',
-#         props = props,
-#     ), 200)
-#     response.headers['Cache-Control'] = 's-maxage=60'
-#     return response
+    response = make_response(render_template(
+        'admin/accounts.html',
+        props = props,
+    ), 200)
+    response.headers['Cache-Control'] = 's-maxage=60'
+    return response
 
 # @admin.route('/admin/accounts/<account_id>', methods= ['GET'])
 # def get_account_info(account_id: str):
@@ -147,3 +153,7 @@ def change_account_roles():
 #     ), 200)
 #     response.headers['Cache-Control'] = 's-maxage=60'
 #     return response
+
+def convert_ids_to_int(list: List[str]):
+    if list and len(list) != 0:
+        return [int(item) for item in list]

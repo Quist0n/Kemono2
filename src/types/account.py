@@ -31,12 +31,10 @@ class Account:
         id: str,
         username: str,
         created_at: datetime,
-        password_hash: Optional[str],
         role: str = 'consumer',
     ) -> None:
         self.id = id
         self.username = username
-        self.password_hash = password_hash if password_hash else None
         self.created_at = created_at
         self.role = role if role else 'consumer'
 
