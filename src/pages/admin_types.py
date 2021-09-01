@@ -1,6 +1,6 @@
 from typing import List, Dict
-
 from ..types.account import Account
+from ..lib.pagination import Pagination
 
 class Dashboard:
     def __init__(self,
@@ -10,11 +10,13 @@ class Dashboard:
 class Accounts:
     def __init__(self, 
         accounts: List[Account],
-        role_list: List[str]
+        role_list: List[str],
+        pagination: Pagination
     ) -> None:
         self.current_page = 'admin'
         self.accounts = accounts
         self.role_list = role_list
+        self.pagination = pagination
     
 class Account_Props:
     def __init__(self,

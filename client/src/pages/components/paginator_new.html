@@ -1,0 +1,74 @@
+{% macro paginator(request, pagination, class_name= none) %}
+  {% set skip = pagination.offset %}
+  {% set current_page = pagination.current_page %}
+
+  <div class="paginator {{ class_name if class_name }}">
+    <small class="paginator__count">
+      Showing {{ skip + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
+    </small>
+    <ul class="paginator__pages">
+      <li class="paginator__page">
+        {% if current_page != 1 %}
+          <a 
+          class="paginator__link"
+          href="{{ url_for(request.endpoint, o = 0, **pagination.base) }}" 
+        >
+          1
+        </a>
+        {% else %}
+          <span class="paginator__link">
+            1
+          </span>
+        {% endif %}
+        
+      </li>
+      <li class="paginator__page">
+        {% if current_page != 1 %}
+          <a 
+            class="paginator__link"
+            href="{{ url_for(request.endpoint, o = pagination.offset - pagination.limit, **pagination.base) }}" 
+          >
+            {{ current_page - 1 or 1 }}
+          </a>
+        {% else %}
+          <span class="paginator__link">
+            ...
+          </span>
+        {% endif %}
+        
+      </li>
+      <li class="paginator__page">
+        {{ current_page }}
+      </li>
+      <li class="paginator__page">
+        {% if current_page != pagination.total_pages %}
+          <a 
+            class="paginator__link"
+            href="{{ url_for(request.endpoint, o = pagination.offset + pagination.limit, **pagination.base) }}" 
+          >
+            {{ current_page + 1 }}
+          </a>
+        {% else %}
+          <span class="paginator__link">
+            ...
+          </span>
+        {% endif %}
+      </li>
+
+      <li class="paginator__page">
+        {% if current_page != pagination.total_pages %}
+          <a 
+            class="paginator__link"
+            href="{{ url_for(request.endpoint, o = pagination.count, **pagination.base) }}" 
+          >
+            {{ pagination.total_pages }} 
+          </a>
+        {% else %}
+          <span class="paginator__link">
+            {{ pagination.total_pages }} 
+          </span>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
+{% endmacro %}

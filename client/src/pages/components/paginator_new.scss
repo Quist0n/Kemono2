@@ -1,0 +1,15 @@
+.paginator {
+  &__count {}
+  
+  &__pages {
+    display: flex;
+    flex-flow: row-reverse nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    list-style: none;
+  }
+
+  &__page {}
+  &__link {}
+}

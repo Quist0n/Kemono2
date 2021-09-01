@@ -1,4 +1,5 @@
-archiver/
+# Dev only files
+test/
 
 # Webpack dev server temp files
 client/dev

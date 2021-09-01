@@ -2,6 +2,7 @@
 
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/account.html' import account_card %}
+{% from 'components/paginator_new.html' import paginator %}
 
 {% block content %}
 <section class="site-section site-section--admin-accounts">
@@ -18,7 +19,15 @@
   >
     <div class="form__section">
       <label for="search-name" class="form__label">Name:</label>
-      <input type="text" name="name" id="search-name" class="form__input">
+      <input 
+        id="search-name" 
+        class="form__input"
+        type="text" 
+        name="name" 
+        {% if request.form.get('name') %}
+          value="{{ request.form.get('name') }}"
+        {% endif %}
+      >
     </div>
     {# <div class="form__section">
       <label 
@@ -54,7 +63,8 @@
   <form
     id="account-list"
     method="POST"
-  >
+  > 
+    {{ paginator(request, props.pagination) }}
     {% call card_list('legacy') %}
       {% for account in props.accounts %}
         {% if account.role == 'moderator' %}
@@ -99,6 +109,8 @@
         <p>No accounts found.</p>
       {% endfor %}
     {% endcall %}
+    {{ paginator(request, props.pagination) }}
+    
     {% if props.accounts | length %}
       <div class="form__section">
         <button 
