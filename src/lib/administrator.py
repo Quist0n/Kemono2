@@ -11,8 +11,8 @@ def get_administrator():
 def get_account(account_id: str) -> Account:
     cursor = get_cursor()
     query = """
-        SELECT id, username, created_at, role 
-        FROM account 
+        SELECT id, username, created_at, role
+        FROM account
         WHERE id = %s
         """
     cursor.execute(query, (account_id))
@@ -21,15 +21,26 @@ def get_account(account_id: str) -> Account:
 
     return account
 
+
+def get_number_of_accounts () -> int:
+    cursor = get_cursor()
+    query = """
+    SELECT COUNT(*) AS total_number_of_accounts FROM account;
+    """
+    cursor.execute(query)
+    number_of_accounts = cursor.fetchone().get('total_number_of_accounts')
+    cursor.close()
+    return number_of_accounts
+
 def get_accounts(pagination: Pagination) -> List[Account]:
     cursor = get_cursor()
     query = """
-        SELECT id, username, created_at, role 
-        FROM account 
-        ORDER BY 
+        SELECT id, username, created_at, role
+        FROM account
+        ORDER BY
             created_at DESC,
             username
-        OFFSET %s 
+        OFFSET %s
         LIMIT %s;
         """
     cursor.execute(query, (pagination.offset, pagination.limit))
@@ -45,31 +56,31 @@ def search_accounts(pagination: Pagination, name: str) -> List[Account]:
         SELECT id, username, created_at, role
         FROM account
         WHERE username LIKE %s
-        ORDER BY 
+        ORDER BY
             created_at DESC,
             username
-        OFFSET %s 
+        OFFSET %s
         LIMIT %s;
         """
     cursor.execute(
-        query, 
+        query,
         (
-            term, 
-            pagination.offset, 
+            term,
+            pagination.offset,
             pagination.limit
         )
     )
     accounts = cursor.fetchall()
     accounts = init_accounts_from_dict(accounts)
-    
+
     return accounts
 
 def promote_consumers_to_moderators(account_ids: List[str]):
     cursor = get_cursor()
     query = """
-        UPDATE account 
-        SET role = \'moderator\' 
-        WHERE id = ANY (%s) 
+        UPDATE account
+        SET role = \'moderator\'
+        WHERE id = ANY (%s)
         ;
         """
     cursor.execute(query, (account_ids,))
@@ -79,9 +90,9 @@ def promote_consumers_to_moderators(account_ids: List[str]):
 def demote_moderators_to_consumers(account_ids: List[str]):
     cursor = get_cursor()
     query = """
-        UPDATE account 
-        SET role = \'consumer\' 
-        WHERE id = ANY (%s) 
+        UPDATE account
+        SET role = \'consumer\'
+        WHERE id = ANY (%s)
         ;
         """
     cursor.execute(query, (account_ids,))
