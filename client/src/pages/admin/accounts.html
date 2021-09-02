@@ -2,7 +2,7 @@
 
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/account.html' import account_card %}
-{% from 'components/paginator_new.html' import paginator %}
+{% from 'components/paginator_new.html' import paginator, paginator_controller %}
 
 {% block content %}
 <section class="site-section site-section--admin-accounts">
@@ -60,11 +60,12 @@
       </button>
     </div>
   </form>
+  
   <form
     id="account-list"
     method="POST"
-  > 
-    {{ paginator(request, props.pagination) }}
+  >  
+    {{ paginator('account-pages', request, props.pagination) }}
     {% call card_list('legacy') %}
       {% for account in props.accounts %}
         {% if account.role == 'moderator' %}
@@ -109,8 +110,7 @@
         <p>No accounts found.</p>
       {% endfor %}
     {% endcall %}
-    {{ paginator(request, props.pagination) }}
-    
+    {# {{ paginator('account-pages', request, props.pagination) }} #}
     {% if props.accounts | length %}
       <div class="form__section">
         <button 
@@ -122,5 +122,10 @@
       </div>
     {% endif %}
   </form>
+  {{ paginator_controller(
+    'account-pages',
+    request,
+    props.pagination
+  ) }}
 </section>
 {% endblock content %}

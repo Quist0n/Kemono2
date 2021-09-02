@@ -1,20 +1,22 @@
-{% macro paginator(request, pagination, class_name= none) %}
-  {% set skip = pagination.offset %}
+{% from 'components/links.html' import link_button %}
+
+{# `id` is the id of related `form_controller()` #}
+{% macro paginator(id, request, pagination, class_name= none) %}
   {% set current_page = pagination.current_page %}
 
   <div class="paginator {{ class_name if class_name }}">
     <small class="paginator__count">
-      Showing {{ skip + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
+      Showing {{ pagination.offset + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
     </small>
     <ul class="paginator__pages">
       <li class="paginator__page">
         {% if current_page != 1 %}
-          <a 
-          class="paginator__link"
-          href="{{ url_for(request.endpoint, o = 0, **pagination.base) }}" 
-        >
-          1
-        </a>
+          {{ link_button(
+            url_for(request.endpoint, page = 1, **pagination.base),
+            1,
+            is_noop=false,
+            class_name= 'paginator__link'
+          ) }}
         {% else %}
           <span class="paginator__link">
             1
@@ -23,31 +25,41 @@
         
       </li>
       <li class="paginator__page">
-        {% if current_page != 1 %}
-          <a 
-            class="paginator__link"
-            href="{{ url_for(request.endpoint, o = pagination.offset - pagination.limit, **pagination.base) }}" 
-          >
-            {{ current_page - 1 or 1 }}
-          </a>
+        {% if current_page > 2 %}
+          {{ link_button(
+            url_for(request.endpoint, page = current_page - 1, **pagination.base),
+            current_page - 1,
+            is_noop=false,
+            class_name= 'paginator__link'
+          ) }}
         {% else %}
-          <span class="paginator__link">
+          <span class="paginator__link" >
             ...
           </span>
         {% endif %}
         
       </li>
       <li class="paginator__page">
-        {{ current_page }}
+        <input
+          class="form__input paginator__input"
+          form= "{{ id }}"
+          type="number" 
+          name="page" 
+          value="{{ current_page }}"
+          min="1"
+          max="{{ pagination.total_pages }}"
+          step="1"
+        >
+        {# <button form="{{ id }}" type="submit">Go!</button> #}
       </li>
       <li class="paginator__page">
-        {% if current_page != pagination.total_pages %}
-          <a 
-            class="paginator__link"
-            href="{{ url_for(request.endpoint, o = pagination.offset + pagination.limit, **pagination.base) }}" 
-          >
-            {{ current_page + 1 }}
-          </a>
+        {% if current_page < pagination.total_pages - 1 %}
+          {{ link_button(
+            url_for(request.endpoint, page = current_page + 1, **pagination.base),
+            current_page + 1,
+            is_noop=false,
+            class_name= 'paginator__link'
+          ) }}
         {% else %}
           <span class="paginator__link">
             ...
@@ -57,12 +69,16 @@
 
       <li class="paginator__page">
         {% if current_page != pagination.total_pages %}
-          <a 
-            class="paginator__link"
-            href="{{ url_for(request.endpoint, o = pagination.count, **pagination.base) }}" 
-          >
-            {{ pagination.total_pages }} 
-          </a>
+          {{ link_button(
+            url_for(
+              request.endpoint, 
+              page = pagination.total_pages, 
+              **pagination.base
+            ),
+            pagination.total_pages,
+            is_noop=false,
+            class_name= 'paginator__link'
+          ) }}
         {% else %}
           <span class="paginator__link">
             {{ pagination.total_pages }} 
@@ -71,4 +87,19 @@
       </li>
     </ul>
   </div>
+{% endmacro %}
+
+{# **kwargs is <form> attributes #}
+{% macro paginator_controller(id, request, pagination) %}
+  <form
+    id="{{ id }}"
+    class="paginator__controller"
+    method="GET"
+    action="{{ url_for(request.endpoint, **pagination.base) }}"
+    target="_self"
+    {% for attribute in kwargs %}
+      {{ attribute }}="{{ kwargs[attribute] }}"
+    {% endfor %}
+  >
+  </form>
 {% endmacro %}

@@ -1,15 +1,29 @@
+@use "../../css/variables.scss" as *;
+
 .paginator {
   &__count {}
   
   &__pages {
     display: flex;
-    flex-flow: row-reverse nowrap;
+    flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
     gap: 1em;
     list-style: none;
   }
 
-  &__page {}
-  &__link {}
+  &__page {
+  }
+
+  &__link {
+    padding: $size-small;
+  }
+
+  &__input {
+    text-align: center;
+  }
+
+  &__controller {
+    display: none;
+  }
 }

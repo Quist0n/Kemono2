@@ -52,3 +52,19 @@
     {{ text if not caller else caller() }}
   </a>
 {% endmacro %}
+
+{% macro link_button(url, text=url, is_noop=true, class_name=none) %}
+  <a 
+    class="fancy-link fancy-link--button {{ class_name if class_name }}"
+    href="{{ url }}"
+    {% if is_noop %}
+      target="_blank"
+      rel="noopener noreferrer"
+    {% endif %}
+  >
+    <span class="fancy-link__text">
+      {{ text if not caller else caller() }}
+    </span>
+    
+  </a>
+{% endmacro %}

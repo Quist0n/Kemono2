@@ -25,7 +25,10 @@ def get_account(account_id: str) -> Account:
 def get_number_of_accounts () -> int:
     cursor = get_cursor()
     query = """
-    SELECT COUNT(*) AS total_number_of_accounts FROM account;
+    SELECT COUNT(*) AS total_number_of_accounts 
+    FROM account
+    WHERE role != \'administrator\'
+    ;
     """
     cursor.execute(query)
     number_of_accounts = cursor.fetchone().get('total_number_of_accounts')
@@ -46,6 +49,9 @@ def get_accounts(pagination: Pagination) -> List[Account]:
     cursor.execute(query, (pagination.offset, pagination.limit))
     accounts = cursor.fetchall()
     accounts = init_accounts_from_dict(accounts)
+
+    count = get_number_of_accounts()
+    pagination.add_count(count)
 
     return accounts
 
