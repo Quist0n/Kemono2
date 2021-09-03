@@ -6,7 +6,7 @@
 
   <div class="paginator {{ class_name if class_name }}">
     <small class="paginator__count">
-      Showing {{ pagination.offset + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
+        Showing {{ pagination.offset + 1 }} - {{ pagination.current_count }} of {{ pagination.count }}
     </small>
     <ul class="paginator__pages">
       <li class="paginator__page">
@@ -37,9 +37,12 @@
             ...
           </span>
         {% endif %}
-        
       </li>
-      <li class="paginator__page">
+
+      <li 
+        class="paginator__page paginator__page--current"
+        style="--local-width: {{ pagination.total_pages | string | length + 4 }}em;"
+      >
         <input
           class="form__input paginator__input"
           form= "{{ id }}"
@@ -50,8 +53,15 @@
           max="{{ pagination.total_pages }}"
           step="1"
         >
-        {# <button form="{{ id }}" type="submit">Go!</button> #}
+        <button 
+          class="form__button form__button--submit paginator__submit"
+          type="submit"
+          form="{{ id }}" 
+        >
+          Go!
+        </button>
       </li>
+
       <li class="paginator__page">
         {% if current_page < pagination.total_pages - 1 %}
           {{ link_button(

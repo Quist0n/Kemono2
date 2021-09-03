@@ -13,6 +13,16 @@
   }
 
   &__page {
+
+    &--current {
+      position: relative;
+      flex: 0 1 var(--local-width);
+
+      &:focus-within .paginator__submit {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
   }
 
   &__link {
@@ -21,6 +31,18 @@
 
   &__input {
     text-align: center;
+  }
+
+  &__submit {
+    position: absolute;
+    top: calc(100% + 0.5em);
+    left: 0;
+    z-index: 1;
+    visibility: hidden;
+    opacity: 0;
+
+    transition-property: visibility, opacity;
+    transition-duration: var(--duration-global);
   }
 
   &__controller {

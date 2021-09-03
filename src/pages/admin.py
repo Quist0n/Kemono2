@@ -8,7 +8,7 @@ from ..lib.administrator import demote_moderators_to_consumers, get_account, get
 from ..lib.account import load_account
 from ..lib.pagination import Pagination
 
-from ..types.account import Account, account_roles
+from ..types.account import visible_roles
 from .admin_types import admin_props
 
 admin = Blueprint(
@@ -33,14 +33,17 @@ def get_admin():
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
 
-@admin.route('/admin/accounts', methods= ['GET'])
+@admin.get('/admin/accounts')
 def get_accounts_list():
+    queries = request.args.to_dict()
+    queries['name'] = queries.get('name') if queries.get('name') else None
+    # transform `role` query into a list for db query
+    queries['role'] = [queries.get('role')] if queries.get('role') != 'all' else visible_roles
     pagination = Pagination(request)
-    accounts = get_accounts(pagination)
-
+    accounts = get_accounts(pagination, queries)
     props = admin_props.Accounts(
         accounts= accounts,
-        role_list= account_roles,
+        role_list= visible_roles,
         pagination= pagination
     )
 
@@ -51,7 +54,7 @@ def get_accounts_list():
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
 
-@admin.route('/admin/accounts', methods= ['POST'])
+@admin.post('/admin/accounts')
 def change_account_roles():
     form_dict = request.form.to_dict(flat=False)
     candidates = {
@@ -74,27 +77,6 @@ def change_account_roles():
 
     return response
 
-@admin.route('/admin/accounts/search', methods= ['POST'])
-def account_search():
-    """
-    Search results for accounts.
-    """
-    name = request.form.get('name')
-    pagination = Pagination(request)
-    accounts = search_accounts(pagination, name)
-    pagination.add_count(len(accounts))
-    props = admin_props.Accounts(
-        accounts= accounts,
-        pagination= pagination,
-        role_list= account_roles
-    )
-
-    response = make_response(render_template(
-        'admin/accounts.html',
-        props = props,
-    ), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
-    return response
 
 # @admin.route('/admin/accounts/<account_id>', methods= ['GET'])
 # def get_account_info(account_id: str):

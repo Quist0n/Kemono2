@@ -3,6 +3,7 @@ from typing import Optional, Union
 # from packaging.version import parse as parse_version
 
 account_roles = ['consumer', 'moderator', 'administrator']
+visible_roles = account_roles[:-1]
 
 # class Agreement:
 #     """
