@@ -6,17 +6,19 @@
   &--local {}
 
   &--button {
+    --local-border-width: $size-nano;
+
     display: inline-block;
     min-height: $button-min-height;
     min-width: $button-min-width;
     background-color: var(--local-colour2-secondary);
     border-radius: 5px;
-    border: $size-nano solid var(--local-colour1-primary);
+    border: var(--local-border-width) solid var(--local-colour1-primary);
     padding: $size-small;
 
     & .fancy-link__text {
       background-color: transparent;
-      border-bottom: $size-nano solid transparent;
+      border-bottom: var(--local-border-width) solid transparent;
 
       transition-property: color, border-color, background-color;
       transition-duration: var(--duration-global);
@@ -52,5 +54,12 @@
         border-color: var(--local-colour2-primary);
       }
     }
+  }
+
+  &__text {
+    position: relative;
+    // center the text in the button
+    // by moving it a border width lower
+    top: var(--local-border-width);
   }
 }

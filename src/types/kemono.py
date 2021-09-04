@@ -1,23 +1,39 @@
 from datetime import datetime
-from typing import Union, Optional, Tuple
+from dataclasses import dataclass
+from abc import abstractmethod
+from typing import Dict, Optional
 
-class Database_Entry:
-    def __init__(self, 
-        id: str
-    ) -> None:
-        id = id
+from ..internals.types import AbstractDataclass
+
+@dataclass()
+class Database_Entry(AbstractDataclass):
+    """
+    Abstract class for all items retrieved from or stored in database.
+    """
+    id: str
     
-    def from_db_query(self, query_result: Tuple):
+    @classmethod
+    @abstractmethod
+    def init_from_dict(cls, dict: Dict):
         """
         Initialize off the DB query result.
         """
-        entry = Database_Entry()
-        return entry
 
+    @abstractmethod
     def serialize():
+        """
+        Serialize python-specific property types.
+        Mostly used for Redis caching.
+        """
         pass
-
+    
+    @abstractmethod
     def deserialize():
+        """
+        Deserialize certain properties into python-specific types.
+        Mostly for transforming the results returned by Redis cache.
+        `Psycopg` already transforms between types where applicable.
+        """
         pass
     
 class DM:
