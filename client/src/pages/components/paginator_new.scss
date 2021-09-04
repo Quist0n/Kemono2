@@ -13,7 +13,10 @@
   }
 
   &__page {
-
+    display: grid;
+    min-width: 44px;
+    min-height: 44px;
+    
     &--current {
       position: relative;
       flex: 0 1 var(--local-width);
