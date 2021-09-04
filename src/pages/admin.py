@@ -37,7 +37,7 @@ def get_accounts_list():
     queries['name'] = queries.get('name') if queries.get('name') else None
 
     # transform `role` query into a list for db query
-    if queries.get('role'):
+    if queries.get('role') and queries.get('role') != 'all':
         queries['role'] = [queries['role']]
     else:
         queries['role'] = visible_roles
