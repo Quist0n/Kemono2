@@ -11,8 +11,8 @@ from ..types.account import Account, Moderator
 def get_account(account_id: str) -> Account:
     cursor = get_cursor()
     query = """
-        SELECT id, username, created_at, role 
-        FROM account 
+        SELECT id, username, created_at, role
+        FROM account
         WHERE id = %s
         """
     cursor.execute(query, (account_id))
@@ -26,9 +26,9 @@ def count_accounts(queries: Dict[str, str]) -> int:
     term = f"%{queries['name']}%"
     cursor = get_cursor()
     query = """
-        SELECT COUNT(*) AS total_number_of_accounts 
+        SELECT COUNT(*) AS total_number_of_accounts
         FROM account
-        WHERE 
+        WHERE
             username LIKE %s
             AND role = ANY(%s)
         ;
@@ -42,27 +42,28 @@ def count_accounts(queries: Dict[str, str]) -> int:
     return number_of_accounts
 
 def get_accounts(pagination: Pagination, queries: Dict[str, str]) -> List[Account]:
-    term = f"%{queries['name']}%"
+
+    arg_dict = {
+            'role': queries['role'], # Role seem to not being parsed correctly, fix this
+            'offset':pagination.offset,
+            'limit':pagination.limit,
+            }
+
     cursor = get_cursor()
-    query = """
-        SELECT id, username, created_at, role
-        FROM account
-        WHERE 
-            username LIKE %s
-            AND role = ANY(%s)
-        ORDER BY
-            created_at DESC,
-            username
-        OFFSET %s
-        LIMIT %s
-        ;
-        """
-    cursor.execute(query, (
-        term,
-        queries['role'],
-        pagination.offset, 
-        pagination.limit
-    ))
+    query = "SELECT id, username, created_at, role FROM account "
+#    query += "WHERE role IN (%(role)s) "
+#This is hardcoded, gotta fix
+    query += "WHERE role IN ('consumer', 'moderator') "
+    if queries['name'] is not None:
+        arg_dict['username'] = f"%{queries['name']}%"
+        query += "AND username LIKE %(username)s "
+
+    query += "ORDER BY created_at DESC, username OFFSET %(offset)s LIMIT %(limit)s;"
+
+    print(f"Role: {arg_dict['role']}")
+    print(f"Args: {arg_dict}")
+    print(f"Pre-execution Query: {query}")
+    cursor.execute(query, arg_dict)
     accounts = cursor.fetchall()
     accounts = init_accounts_from_dict(accounts)
 
@@ -75,7 +76,7 @@ def search_accounts(pagination: Pagination, queries: Dict[str, str]) -> List[Acc
     query = """
         SELECT id, username, created_at, role
         FROM account
-        WHERE 
+        WHERE
             username LIKE %s AND
             role = ANY(%s)
         ORDER BY
@@ -103,9 +104,9 @@ def count_total_search_results(queries: Dict[str, str]) -> int:
     term = f"%%{queries['name']}%%"
     cursor = get_cursor()
     query = """
-        SELECT COUNT(*) AS total_number_of_accounts 
+        SELECT COUNT(*) AS total_number_of_accounts
         FROM account
-        WHERE 
+        WHERE
             username LIKE %s AND
             role = ANY(%s)
         ;
