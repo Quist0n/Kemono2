@@ -5,7 +5,8 @@ from typing import Dict, List
 
 def send_notifications(account_ids: List[str], notification_type: int, extra_info: Dict[str,str]) -> bool:
     cursor = get_cursor()
-    if len(account_ids) == 0:
+
+    if not account_ids:
         return False
 
     if extra_info is not None:
