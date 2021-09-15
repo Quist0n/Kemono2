@@ -2,8 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from src.internals.types import DatabaseEntry
-from typing import Optional, Union
-from typing_extensions import Literal
+from typing import Optional, Union, Literal
 # from packaging.version import parse as parse_version
 
 account_roles = ['consumer', 'moderator', 'administrator']
@@ -16,17 +15,17 @@ class Account(DatabaseEntry):
     created_at: datetime
     role: str
 
-@dataclass
-class Consumer(Account):
-    role: Literal['consumer']
+# @dataclass
+# class Consumer(Account):
+#     pass
     
-@dataclass
-class Moderator(Account):
-    role: Literal['moderator']
+# @dataclass
+# class Moderator(Account):
+#     pass
 
-@dataclass
-class Administrator(Account):
-    role: Literal['administrator']
+# @dataclass
+# class Administrator(Account):
+#     pass
 
 # class Agreement:
 #     """

@@ -15,6 +15,8 @@ def send_notifications(account_ids: List[str], notification_type: int, extra_inf
         notification_values = f'(%s, {notification_type}, NULL)'
 
     insert_queries_values_template = ",".join([notification_values] * len(account_ids))
-    insert_query = f"INSERT INTO notification (account_id, type, extra_info) VALUES {insert_queries_values_template}"
+    insert_query = f"""
+        INSERT INTO notification (account_id, type, extra_info) 
+        VALUES {insert_queries_values_template}"""
     cursor.execute(insert_query, account_ids)
     return True

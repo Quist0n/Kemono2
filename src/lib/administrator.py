@@ -4,7 +4,7 @@ from ..lib.account import init_account_from_dict, init_accounts_from_dict
 from ..lib.notification import send_notifications
 
 from typing import Dict, List
-from ..types.account import Account, Moderator
+from ..types.account import Account
 
 # def get_administrator():
 #     pass
@@ -18,7 +18,7 @@ def get_account(account_id: str) -> Account:
         """
     cursor.execute(query, (account_id))
     account = cursor.fetchone()
-    account = init_account_from_dict(account)
+    account = Account.init_from_dict(account)
 
     return account
 

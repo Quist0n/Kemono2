@@ -1,4 +1,4 @@
-from abc import abstractmethod
+# from abc import abstractmethod
 from dataclasses import dataclass, fields
 
 from typing import Dict
@@ -8,13 +8,13 @@ from src.internals.types import AbstractDataclass
 class DatabaseEntry(AbstractDataclass):
     
     @classmethod
-    def init_from_dict(cls, d: Dict):
+    def init_from_dict(cls, dictionary: Dict):
         """
         Init a dataclass instance off a dictionary.
         """
         instance = cls(**{ key: value
-            for key, value in d.items()
-            if key in { i.name for i in fields(cls) }
+            for key, value in dictionary.items()
+            if key in { field.name for field in fields(cls) }
         })
         return instance
     

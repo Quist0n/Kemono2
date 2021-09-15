@@ -6,7 +6,7 @@
   &--local {}
 
   &--button {
-    --local-border-width: $size-nano;
+    --local-border-width: #{$size-nano};
 
     display: inline-block;
     min-height: $button-min-height;
