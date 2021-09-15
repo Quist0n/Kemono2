@@ -1,40 +1,6 @@
 from datetime import datetime
-from dataclasses import dataclass
-from abc import abstractmethod
-from typing import Dict, Optional
 
-from ..internals.types import AbstractDataclass
-
-@dataclass()
-class Database_Entry(AbstractDataclass):
-    """
-    Abstract class for all items retrieved from or stored in database.
-    """
-    id: str
-    
-    @classmethod
-    @abstractmethod
-    def init_from_dict(cls, dict: Dict):
-        """
-        Initialize off the DB query result.
-        """
-
-    @abstractmethod
-    def serialize():
-        """
-        Serialize python-specific property types.
-        Mostly used for Redis caching.
-        """
-        pass
-    
-    @abstractmethod
-    def deserialize():
-        """
-        Deserialize certain properties into python-specific types.
-        Mostly for transforming the results returned by Redis cache.
-        `Psycopg` already transforms between types where applicable.
-        """
-        pass
+from typing import Optional
     
 class DM:
     def __init__(self, 

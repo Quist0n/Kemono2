@@ -1,9 +1,32 @@
+from dataclasses import dataclass
 from datetime import datetime
+
+from src.internals.types import DatabaseEntry
 from typing import Optional, Union
+from typing_extensions import Literal
 # from packaging.version import parse as parse_version
 
 account_roles = ['consumer', 'moderator', 'administrator']
 visible_roles = account_roles[:-1]
+
+@dataclass
+class Account(DatabaseEntry):
+    id: int
+    username: str
+    created_at: datetime
+    role: str
+
+@dataclass
+class Consumer(Account):
+    role: Literal['consumer']
+    
+@dataclass
+class Moderator(Account):
+    role: Literal['moderator']
+
+@dataclass
+class Administrator(Account):
+    role: Literal['administrator']
 
 # class Agreement:
 #     """
@@ -26,45 +49,3 @@ visible_roles = account_roles[:-1]
 #     approved: list[str]
 #     rejected: list[str]
 #     pending: list[str]
-
-class Account:
-    def __init__(self, 
-        id: str,
-        username: str,
-        created_at: datetime,
-        role: str = 'consumer',
-    ) -> None:
-        self.id = id
-        self.username = username
-        self.created_at = created_at
-        self.role = role if role else 'consumer'
-
-class Moderator(Account):
-    def __init__(self, 
-        id: str, 
-        username: str, 
-        password_hash: str, 
-        created_at: datetime,
-    ) -> None:
-        super().__init__(
-            id, 
-            username, 
-            password_hash, 
-            created_at, 
-            role='moderator'
-        )
-
-class Administrator(Account):
-    def __init__(self, 
-        id: str, 
-        username: str, 
-        password_hash: str, 
-        created_at: datetime
-    ) -> None:
-        super().__init__(
-            id, 
-            username, 
-            password_hash, 
-            created_at, 
-            role='administrator'
-        )
