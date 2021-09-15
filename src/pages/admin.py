@@ -2,9 +2,7 @@ from typing import List
 from flask import Blueprint, request, make_response, render_template, abort
 from datetime import datetime
 
-from ..utils.utils import limit_int
-
-from ..lib.administrator import demote_moderators_to_consumers, get_account, get_accounts, promote_consumers_to_moderators, search_accounts
+from ..lib.administrator import get_account, get_accounts, change_account_role
 from ..lib.account import load_account
 from ..lib.pagination import Pagination
 
@@ -37,8 +35,13 @@ def get_admin():
 def get_accounts_list():
     queries = request.args.to_dict()
     queries['name'] = queries.get('name') if queries.get('name') else None
+
     # transform `role` query into a list for db query
-    queries['role'] = [queries.get('role')] if queries.get('role') != 'all' else visible_roles
+    if queries.get('role') and queries.get('role') != 'all':
+        queries['role'] = [queries['role']]
+    else:
+        queries['role'] = visible_roles
+
     pagination = Pagination(request)
     accounts = get_accounts(pagination, queries)
     props = admin_props.Accounts(
@@ -61,9 +64,9 @@ def change_account_roles():
         "moderator": convert_ids_to_int(form_dict.get('moderator')),
         "consumer": convert_ids_to_int(form_dict.get('consumer'))
     }
-    
-    are_promoted = promote_consumers_to_moderators(candidates["moderator"])
-    are_demoted = demote_moderators_to_consumers(candidates["consumer"])
+
+    # TODO: Change this line here and use the function as you see fit for this
+    change_account_role(candidates["moderator"], 'moderator', None)
     props = {
         'currentPage': 'admin',
         'redirect': f"/admin/accounts"
