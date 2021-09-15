@@ -1,6 +1,7 @@
 from ..internals.database.database import get_cursor
 from ..lib.pagination import Pagination
 from ..lib.account import init_account_from_dict, init_accounts_from_dict
+from ..lib.notification import send_notifications
 
 from typing import Dict, List
 from ..types.account import Account, Moderator
@@ -97,6 +98,25 @@ def demote_moderators_to_consumers(account_ids: List[str]):
         ;
         """
     cursor.execute(query, (account_ids,))
+
+    return True
+
+def change_account_role(account_ids: List[str], new_role: str, extra_info: dict):
+    cursor = get_cursor()
+    arg_dict = {
+        "account_ids": account_ids,
+        "new_role": new_role
+    }
+
+    change_role_query = """
+        UPDATE account
+        SET role = %(new_role)s
+        WHERE id = ANY (%(account_ids)s)
+        ;
+        """
+    cursor.execute(change_role_query, arg_dict)
+    # TODO: Change notification_type (that 1) to whatever we use in future for account role changes
+    send_notifications(account_ids, 1, extra_info)
 
     return True
 
