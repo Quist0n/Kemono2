@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from src.internals.types import DatabaseEntry
-from typing import Optional, Union, Literal
+# from typing import Optional, Union, Literal
 # from packaging.version import parse as parse_version
 
 account_roles = ['consumer', 'moderator', 'administrator']

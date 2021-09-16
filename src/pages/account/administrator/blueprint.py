@@ -1,37 +1,37 @@
-from typing import List
 from flask import Blueprint, request, make_response, render_template, abort
-from datetime import datetime
+# from datetime import datetime
 
-from ..lib.administrator import get_account, get_accounts, change_account_role
-from ..lib.account import load_account
-from ..lib.pagination import Pagination
+from src.lib.administrator import get_account, get_accounts, change_account_role
+from src.lib.account import load_account
+from src.lib.pagination import Pagination
 
-from ..types.account import visible_roles
-from .admin_types import admin_props
+from typing import List
+from src.types.account import visible_roles
+from .types import Dashboard, admin_props
 
-admin = Blueprint(
+administrator = Blueprint(
     'admin',
     __name__
 )
 
-@admin.before_request
+@administrator.before_request
 def check_credentials():
     account = load_account()
     if (not account or account['role'] != 'administrator'):
         return abort(404)
 
-@admin.route('/admin')
+@administrator.get('/administrator')
 def get_admin():
-    props = admin_props.Dashboard()
+    props = Dashboard()
 
     response = make_response(render_template(
-        'admin/dashboard.html',
+        'administrator/dashboard.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
 
-@admin.get('/admin/accounts')
+@administrator.get('/administrator/accounts')
 def get_accounts_list():
     queries = request.args.to_dict()
     queries['name'] = queries.get('name') if queries.get('name') else None
@@ -51,13 +51,13 @@ def get_accounts_list():
     )
 
     response = make_response(render_template(
-        'admin/accounts.html',
+        'administrator/accounts.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
 
-@admin.post('/admin/accounts')
+@administrator.post('/administrator/accounts')
 def change_account_roles():
     form_dict = request.form.to_dict(flat=False)
     candidates = {
@@ -69,7 +69,7 @@ def change_account_roles():
     change_account_role(candidates["moderator"], 'moderator', None)
     props = {
         'currentPage': 'admin',
-        'redirect': f"/admin/accounts"
+        'redirect': f"/administrator/accounts"
     }
 
     response = make_response(render_template(

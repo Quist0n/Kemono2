@@ -39,7 +39,7 @@ def load_account(account_id: str = None, reload: bool = False):
         redis.set(key, serialize_account(account))
     else:
         account = deserialize_account(account)
-
+    
     return account
 
 def get_login_info_for_username(username: str):

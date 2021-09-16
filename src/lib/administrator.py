@@ -1,13 +1,10 @@
-from ..internals.database.database import get_cursor
-from ..lib.pagination import Pagination
-from ..lib.account import init_account_from_dict, init_accounts_from_dict
-from ..lib.notification import send_notifications
+from src.internals.database.database import get_cursor
+from src.lib.pagination import Pagination
+from src.lib.account import init_accounts_from_dict
+from src.lib.notification import send_notifications
 
 from typing import Dict, List
-from ..types.account import Account
-
-# def get_administrator():
-#     pass
+from src.types.account import Account, Notification_Types
 
 def get_account(account_id: str) -> Account:
     cursor = get_cursor()
@@ -45,7 +42,7 @@ def count_accounts(queries: Dict[str, str]) -> int:
     return number_of_accounts
 
 def get_accounts(pagination: Pagination, queries: Dict[str, str]) -> List[Account]:
-
+    
     arg_dict = {
         'role': queries['role'],
         'offset': pagination.offset,
@@ -101,7 +98,11 @@ def demote_moderators_to_consumers(account_ids: List[str]):
 
     return True
 
-def change_account_role(account_ids: List[str], new_role: str, extra_info: dict):
+def change_account_role(
+    account_ids: List[str], 
+    new_role: str, 
+    extra_info: dict
+):
     cursor = get_cursor()
     arg_dict = {
         "account_ids": account_ids,
@@ -115,13 +116,6 @@ def change_account_role(account_ids: List[str], new_role: str, extra_info: dict)
         ;
         """
     cursor.execute(change_role_query, arg_dict)
-    # TODO: Change notification_type (that 1) to whatever we use in future for account role changes
-    send_notifications(account_ids, 1, extra_info)
+    send_notifications(account_ids, Notification_Types.ACCOUNT_ROLE_CHANGE, extra_info)
 
     return True
-
-def get_moderator_actions():
-    pass
-
-def search_moderator_actions():
-    pass

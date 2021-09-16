@@ -1,9 +1,13 @@
-from ..internals.database.database import get_cursor
 from json import dumps
+from src.internals.database.database import get_cursor
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-def send_notifications(account_ids: List[str], notification_type: int, extra_info: Dict[str,str]) -> bool:
+def send_notifications(
+    account_ids: List[str], 
+    notification_type: int, 
+    extra_info: Optional[Dict[str,str]]
+) -> bool:
     cursor = get_cursor()
 
     if not account_ids:
@@ -18,6 +22,9 @@ def send_notifications(account_ids: List[str], notification_type: int, extra_inf
     insert_queries_values_template = ",".join([notification_values] * len(account_ids))
     insert_query = f"""
         INSERT INTO notification (account_id, type, extra_info) 
-        VALUES {insert_queries_values_template}"""
+        VALUES {insert_queries_values_template}
+        ;
+        """
     cursor.execute(insert_query, account_ids)
+
     return True
