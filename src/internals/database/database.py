@@ -1,5 +1,6 @@
 from os import getenv
 from flask import g, current_app
+from threading import Lock
 import psycopg2
 from psycopg2 import pool
 from psycopg2.pool import ThreadedConnectionPool
@@ -9,6 +10,7 @@ from typing import Optional
 from psycopg2.extensions import cursor
 
 pool: Optional[ThreadedConnectionPool] = None
+connection_lock = Lock()
 
 def init():
     global pool
@@ -30,6 +32,17 @@ def get_pool():
 
 def get_cursor() -> cursor:
     if 'cursor' not in g:
+        g.connection = pool.getconn()
+        g.cursor = g.connection.cursor()
+    return g.cursor
+
+def get_locked_cursor() -> cursor:
+    """
+    TODO: get rid of it after implementing proper rollbacks.
+    """
+    connection_lock.acquire()
+    if 'cursor' not in g:
+        g.connection_lock = connection_lock
         g.connection = pool.getconn()
         g.cursor = g.connection.cursor()
     return g.cursor

@@ -13,7 +13,7 @@ from .types import AccountPageProps
 
 account = Blueprint('account', __name__)
 
-@account.route('/account/login', methods=['GET'])
+@account.get('/account/login')
 def get_login():
     props = {
         'currentPage': 'login',
@@ -35,7 +35,7 @@ def get_login():
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
 
-@account.route('/account/login', methods=['POST'])
+@account.post('/account/login')
 def post_login():
     account = load_account()
     if account is not None:

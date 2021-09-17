@@ -111,9 +111,22 @@ def close(e):
         cursor.close()
         connection = g.pop('connection', None)
         if connection is not None:
-            try:
-                pool = database.get_pool()
-                connection.commit()
-                pool.putconn(connection)
-            except:
-                pass
+            connection_lock = g.pop('connection_lock', None)
+            if connection_lock is not None:
+                try:
+                    pool = database.get_pool()
+                    is_rolled_back = g.pop('rolled_back', None)
+                    if is_rolled_back is not None:
+                        connection.rollback()
+                    else:
+                        connection.commit()
+                    pool.putconn(connection)
+                except:
+                    pass
+            else:
+                try:
+                    pool = database.get_pool()
+                    connection.commit()
+                    pool.putconn(connection)
+                except:
+                    pass

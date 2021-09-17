@@ -7,7 +7,7 @@ from src.lib.pagination import Pagination
 
 from typing import List
 from src.types.account import visible_roles
-from .types import Dashboard, admin_props
+from .types import Dashboard, Accounts, Role_Change
 
 administrator = Blueprint(
     'admin',
@@ -44,7 +44,7 @@ def get_accounts_list():
 
     pagination = Pagination(request)
     accounts = get_accounts(pagination, queries)
-    props = admin_props.Accounts(
+    props = Accounts(
         accounts= accounts,
         role_list= visible_roles,
         pagination= pagination
@@ -66,11 +66,11 @@ def change_account_roles():
     }
 
     # TODO: Change this line here and use the function as you see fit for this
-    change_account_role(candidates["moderator"], 'moderator', None)
-    props = {
-        'currentPage': 'admin',
-        'redirect': f"/administrator/accounts"
-    }
+    change_account_role(candidates["moderator"], 'moderator', {
+        "old_role": "consumer",
+        "new_role": "moderator"
+    })
+    props = Role_Change()
 
     response = make_response(render_template(
         'success.html',

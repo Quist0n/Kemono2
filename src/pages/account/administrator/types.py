@@ -16,29 +16,23 @@ class Accounts(PageProps):
     pagination: Pagination
     currentPage: str = 'admin'
 
-@dataclass    
-class Account_Props(PageProps):
-    account: Account
-    currentPage: str = 'admin'
-
 @dataclass
-class Account_Files:
-    account: Account
-    files: List[Dict]
+class Role_Change(PageProps):
+    redirect: str = '/administrator/accounts'
     currentPage: str = 'admin'
 
-@dataclass
-class ModeratorsActions():
-    actions: List[Dict]
-    currentPage: str = 'admin'
+# @dataclass    
+# class Account_Props(PageProps):
+#     account: Account
+#     currentPage: str = 'admin'
 
-class Admin:
-    def __init__(self) -> None:
-        self.Dashboard = Dashboard
-        self.Accounts = Accounts
-        self.Account = Account_Props
-        self.Account_Files = Account_Files
-        self.ModeratorActions = ModeratorsActions
+# @dataclass
+# class Account_Files:
+#     account: Account
+#     files: List[Dict]
+#     currentPage: str = 'admin'
 
-
-admin_props = Admin()
+# @dataclass
+# class ModeratorsActions():
+#     actions: List[Dict]
+#     currentPage: str = 'admin'
