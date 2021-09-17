@@ -3,6 +3,7 @@ import datetime
 from datetime import timedelta
 from os import getenv
 from os.path import join, dirname
+from threading import Lock
 from urllib.parse import urljoin
 
 import logging
@@ -120,6 +121,7 @@ def close(e):
                         connection.rollback()
                     else:
                         connection.commit()
+                    connection_lock.release()
                     pool.putconn(connection)
                 except:
                     pass
