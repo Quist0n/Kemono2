@@ -18,7 +18,7 @@ class Accounts(PageProps):
 
 @dataclass
 class Role_Change(PageProps):
-    redirect: str = '/administrator/accounts'
+    redirect: str = '/account/administrator/accounts'
     currentPage: str = 'admin'
 
 # @dataclass    

@@ -56,8 +56,7 @@ def get_accounts(pagination: Pagination, queries: Dict[str, str]) -> List[Accoun
             role = ANY(%(role)s)
             {'AND username LIKE %(username)s' if queries.get('name') is not None else ''}
         ORDER BY
-            created_at DESC, 
-            username
+            created_at DESC
         OFFSET %(offset)s
         LIMIT %(limit)s
     """
@@ -88,6 +87,7 @@ def change_account_role(
         WHERE id = ANY (%(account_ids)s)
     """
     cursor.execute(change_role_query, arg_dict)
+    
     send_notifications(
         account_ids, 
         Notification_Types.ACCOUNT_ROLE_CHANGE, 

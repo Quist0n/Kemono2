@@ -13,5 +13,5 @@ class AccountPageProps(PageProps):
 
 @dataclass
 class NotificationsProps(PageProps):
-    notications: List[Notification]
+    notifications: List[Notification]
     currentPage: str = "account"

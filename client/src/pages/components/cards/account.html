@@ -2,17 +2,19 @@
 {% from 'components/links.html' import kemono_link %}
 
 {% macro account_card(account) %}
-  {% set account_url = '/admin/accounts/' ~ account.id %}
+  {% set account_url = 'account/administrator/accounts/' ~ account.id %}
+
   <article
     class="account-card"
     data-id="{{ account.id }}" 
   >
     <header class="account-card__header">
       <h2 class="account-card__name">
-        {{ kemono_link(
+        {# {{ kemono_link(
           account_url,
           account.username
-        ) }}
+        ) }} #}
+        {{ account.username }}
       </h2>
     </header>
     <section class="account-card__body">

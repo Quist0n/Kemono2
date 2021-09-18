@@ -15,4 +15,4 @@ class Notification(DatabaseEntry):
 
 @unique
 class Notification_Types(IntEnum):
-    ACCOUNT_ROLE_CHANGE: 1
+    ACCOUNT_ROLE_CHANGE = 1

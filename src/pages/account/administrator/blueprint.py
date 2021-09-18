@@ -1,4 +1,4 @@
-from flask import Blueprint, request, make_response, render_template, abort
+from flask import Blueprint, g, request, make_response, render_template, abort
 # from datetime import datetime
 
 from src.lib.administrator import get_account, get_accounts, change_account_role
@@ -6,26 +6,27 @@ from src.lib.account import load_account
 from src.lib.pagination import Pagination
 
 from typing import List
-from src.types.account import visible_roles
+from src.types.account import Account, visible_roles
 from .types import Dashboard, Accounts, Role_Change
 
 administrator = Blueprint(
     'admin',
-    __name__
+    __name__,
 )
 
 @administrator.before_request
 def check_credentials():
     account = load_account()
-    if (not account or account['role'] != 'administrator'):
+    if (not account or account["role"] != 'administrator'):
         return abort(404)
+    
 
 @administrator.get('/administrator')
 def get_admin():
     props = Dashboard()
 
     response = make_response(render_template(
-        'administrator/dashboard.html',
+        'account/administrator/dashboard.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -51,7 +52,7 @@ def get_accounts_list():
     )
 
     response = make_response(render_template(
-        'administrator/accounts.html',
+        'account/administrator/accounts.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
@@ -62,8 +63,8 @@ def change_account_roles():
     form_dict = request.form.to_dict(flat=False)
     candidates = {
         # convert ids to `int`
-        'moderator': [int(id) for id in form_dict.get('moderator')],
-        'consumer': [int(id) for id in form_dict.get('consumer')]
+        'moderator': [int(id) for id in form_dict.get('moderator')] if form_dict.get('moderator') else [],
+        'consumer': [int(id) for id in form_dict.get('consumer')] if form_dict.get('consumer') else []
     }
 
     if len(candidates['moderator']):

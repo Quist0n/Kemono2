@@ -1,8 +1,7 @@
 {% extends 'components/shell.html' %}
 
-{% set notification_types = {
-  1: ACCOUNT_ROLE_CHANGE
-} %}
+{% from 'components/timestamp.html' import timestamp %}
+{% from 'account/components/notification.hmtl' import notification_item %}
 
 {% block title %}
   <title>Account notificatons</title>
@@ -26,13 +25,3 @@
   </ul>
 </section>
 {% endblock content %}
-
-{% macro notification_item(notification) %}
-  <li class="notifications__item">
-    {{ notification_types[notification.type](notification.extra_info) }}
-  </li>
-  
-{% endmacro %}
-
-{% macro ACCOUNT_ROLE_CHANGE(extra_info) %}
-{% endmacro %}

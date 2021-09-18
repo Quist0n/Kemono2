@@ -2,10 +2,11 @@
 
 {% from 'components/timestamp.html' import timestamp %}
 {% from 'components/links.html' import kemono_link %}
+
 {% set role_links = {
   "consumer": "/account",
-  "moderator": "/mod",
-  "administrator": "/admin"
+  "moderator": "/account/moderator",
+  "administrator": "/account/administrator"
 } %}
 
 {% block title %}
@@ -36,6 +37,15 @@
     <div class="def-list__section">
       <dt>Joined:</dt>
       <dd>{{ props.account.created_at }}</dd>
+    </div>
+    <div class="def-list__section">
+      <dt>Notifications:</dt>
+      <dd>
+        {{ kemono_link(
+          url= '/account/notifications',
+          text= props.notifications_count
+        ) }}
+      </dd>
     </div>
   </dl>
 </section>

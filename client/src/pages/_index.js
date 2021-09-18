@@ -1,6 +1,6 @@
 import { bansPage } from "./bans";
 import { userPage } from "./user";
-import { registerPage } from "./register";
+import { registerPage } from "./account/_index.js";
 import { postPage } from "./post";
 import { importerPage } from "./importer_list";
 import { importerStatusPage } from "./importer_status";

@@ -5,7 +5,7 @@ from flask import Blueprint, request, make_response, render_template, session, r
 
 from src.utils.utils import make_cache_key, get_value, set_query_parameter
 from src.lib.account import load_account, is_username_taken, attempt_login, create_account
-from src.lib.notification import count_account_notifications
+from src.lib.notification import count_account_notifications, get_account_notifications
 from src.lib.security import is_password_compromised
 # from src.internals.cache.flask_cache import cache
 from .administrator import administrator
@@ -19,13 +19,16 @@ account = Blueprint('account', __name__)
 @account.before_request
 def get_account_creds():
     account = load_account()
-    if account is None:
-        return redirect(url_for('account.get_login'))
-    g.account = Account.init_from_dict(account)
+    if account:
+        g.account = Account.init_from_dict(account)
+    
 
 @account.get('/account')
 def get_account():
     account: Account = g.account
+    if not account:
+        redirect(url_for('account.get_login'))
+
     notifications_count = count_account_notifications(account.id)
     props = AccountPageProps(
         account=g.account,
@@ -39,9 +42,13 @@ def get_account():
 
 @account.get('/account/notifications')
 def get_notifications():
-    notifications = []
+    account: Account = g.get('account')
+    if not account:
+        redirect(url_for('account.get_login'))
+
+    notifications = get_account_notifications(account.id)
     props = NotificationsProps(
-        notications= notifications
+        notifications= notifications
     )
 
     return make_response(render_template(
@@ -182,5 +189,5 @@ def post_register():
         props = props
     ), 200)
 
-account.register_blueprint(administrator)
-account.register_blueprint(moderator)
+account.register_blueprint(administrator, url_prefix='/account')
+account.register_blueprint(moderator, url_prefix='/account')
