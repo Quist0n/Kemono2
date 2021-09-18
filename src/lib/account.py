@@ -33,7 +33,11 @@ def load_account(account_id: str = None, reload: bool = False):
     account = redis.get(key)
     if account is None or reload:
         cursor = get_cursor()
-        query = 'SELECT id, username, created_at, role FROM account WHERE id = %s'
+        query = """
+            SELECT id, username, created_at, role 
+            FROM account 
+            WHERE id = %s
+        """
         cursor.execute(query, (account_id,))
         account = cursor.fetchone()
         redis.set(key, serialize_account(account))
@@ -70,12 +74,20 @@ def create_account(username: str, password: str, favorites: Optional[List[Dict]]
         scrub = Cleaner(tags = [])
 
         cursor = get_cursor()
-        query = "INSERT into account (username, password_hash) values (%s, %s) returning id"
+        query = """
+            INSERT INTO account (username, password_hash) 
+            VALUES (%s, %s) 
+            RETURNING id
+        """
         cursor.execute(query, (scrub.clean(username), password_hash,))
         account_id = cursor.fetchone()['id']
         if (account_id == 1):
             cursor = get_cursor()
-            query = "UPDATE account SET role = 'administrator' where id = 1"
+            query = """
+                UPDATE account 
+                SET role = 'administrator' 
+                WHERE id = 1
+            """
             cursor.execute(query)
     finally:
         account_create_lock.release()
@@ -127,20 +139,4 @@ def prepare_account_fields(account):
 
 def rebuild_account_fields(account):
     account['created_at'] = dateutil.parser.parse(account['created_at'])
-    return account
-
-def init_accounts_from_dict(accounts: List[Dict]) -> List[Account]:
-    for index, account in enumerate(accounts):
-        accounts[index] = init_account_from_dict(account)
-    
-    return accounts
-
-def init_account_from_dict(account: Dict) -> Account:
-    account = Account(
-        id=account["id"],
-        username=account["username"],
-        created_at=account["created_at"],
-        role=account["role"]
-    )
-
     return account

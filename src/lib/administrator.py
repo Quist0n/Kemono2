@@ -1,6 +1,5 @@
 from src.internals.database.database import get_cursor
 from src.lib.pagination import Pagination
-from src.lib.account import init_accounts_from_dict
 from src.lib.notification import send_notifications
 
 from typing import Dict, List
@@ -34,7 +33,6 @@ def count_accounts(queries: Dict[str, str]) -> int:
         WHERE
             role = ANY(%(role)s)
             {'AND username LIKE %(username)s' if queries.get('name') is not None else ''}
-        ;
     """
     cursor.execute(query, arg_dict)
     result = cursor.fetchone()
@@ -62,41 +60,16 @@ def get_accounts(pagination: Pagination, queries: Dict[str, str]) -> List[Accoun
             username
         OFFSET %(offset)s
         LIMIT %(limit)s
-        ;
     """
     
     cursor.execute(query, arg_dict)
     accounts = cursor.fetchall()
-    accounts = init_accounts_from_dict(accounts)
+    accList = [Account.init_from_dict(acc) for acc in accounts]
 
     count = count_accounts(queries)
     pagination.add_count(count)
 
-    return accounts
-
-def promote_consumers_to_moderators(account_ids: List[str]):
-    cursor = get_cursor()
-    query = """
-        UPDATE account
-        SET role = \'moderator\'
-        WHERE id = ANY (%s)
-        ;
-        """
-    cursor.execute(query, (account_ids,))
-
-    return True
-
-def demote_moderators_to_consumers(account_ids: List[str]):
-    cursor = get_cursor()
-    query = """
-        UPDATE account
-        SET role = \'consumer\'
-        WHERE id = ANY (%s)
-        ;
-        """
-    cursor.execute(query, (account_ids,))
-
-    return True
+    return accList
 
 def change_account_role(
     account_ids: List[str], 
@@ -113,9 +86,12 @@ def change_account_role(
         UPDATE account
         SET role = %(new_role)s
         WHERE id = ANY (%(account_ids)s)
-        ;
-        """
+    """
     cursor.execute(change_role_query, arg_dict)
-    send_notifications(account_ids, Notification_Types.ACCOUNT_ROLE_CHANGE, extra_info)
+    send_notifications(
+        account_ids, 
+        Notification_Types.ACCOUNT_ROLE_CHANGE, 
+        extra_info
+    )
 
     return True

@@ -61,15 +61,22 @@ def get_accounts_list():
 def change_account_roles():
     form_dict = request.form.to_dict(flat=False)
     candidates = {
-        "moderator": convert_ids_to_int(form_dict.get('moderator')),
-        "consumer": convert_ids_to_int(form_dict.get('consumer'))
+        # convert ids to `int`
+        'moderator': [int(id) for id in form_dict.get('moderator')],
+        'consumer': [int(id) for id in form_dict.get('consumer')]
     }
 
-    # TODO: Change this line here and use the function as you see fit for this
-    change_account_role(candidates["moderator"], 'moderator', {
-        "old_role": "consumer",
-        "new_role": "moderator"
-    })
+    if len(candidates['moderator']):
+        change_account_role(candidates['moderator'], 'moderator', {
+            'old_role': 'consumer',
+            'new_role': 'moderator'
+        })
+    if len(candidates["consumer"]):
+        change_account_role(candidates['consumer'], 'consumer', {
+            'old_role': 'moderator',
+            'new_role': 'consumer'
+        })
+
     props = Role_Change()
 
     response = make_response(render_template(
@@ -136,7 +143,3 @@ def change_account_roles():
 #     ), 200)
 #     response.headers['Cache-Control'] = 's-maxage=60'
 #     return response
-
-def convert_ids_to_int(list: List[str]):
-    if list and len(list) != 0:
-        return [int(item) for item in list]

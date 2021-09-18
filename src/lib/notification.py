@@ -3,6 +3,37 @@ from src.internals.database.database import get_cursor
 
 from typing import Dict, List, Optional
 
+def count_account_notifications(account_id: int) -> int:
+    args_dict = {
+        "account_id": account_id
+    }
+
+    cursor = get_cursor()
+    query = """
+        SELECT 
+            COUNT(*) AS notifications_count
+        FROM notification
+        WHERE account_id = %(account_id)s
+    """
+    cursor.execute(query, args_dict)
+    result = cursor.fetchone()
+    notifications_count = result["notifications_count"]
+    return notifications_count
+
+def get_account_notifications(account_id: int):
+    args_dict = {
+        "account_id": account_id
+    }
+
+    cursor = get_cursor()
+    query = """
+        SELECT id, account_id, type, created_at, extra_info
+        FROM notification
+        WHERE account_id = %(account_id)s
+    """
+    cursor.execute(query, args_dict)
+    return
+
 def send_notifications(
     account_ids: List[str], 
     notification_type: int, 

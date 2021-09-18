@@ -1,17 +1,53 @@
 # import urllib
 import json
 
-from flask import Blueprint, request, make_response, render_template, session, redirect, flash, url_for, current_app
+from flask import Blueprint, request, make_response, render_template, session, redirect, flash, url_for, current_app, g
 
 from src.utils.utils import make_cache_key, get_value, set_query_parameter
 from src.lib.account import load_account, is_username_taken, attempt_login, create_account
+from src.lib.notification import count_account_notifications
 from src.lib.security import is_password_compromised
 # from src.internals.cache.flask_cache import cache
 from .administrator import administrator
 from .moderator import moderator
-from .types import AccountPageProps
+
+from src.types.account import Account
+from .types import AccountPageProps, NotificationsProps
 
 account = Blueprint('account', __name__)
+
+@account.before_request
+def get_account_creds():
+    account = load_account()
+    if account is None:
+        return redirect(url_for('account.get_login'))
+    g.account = Account.init_from_dict(account)
+
+@account.get('/account')
+def get_account():
+    account: Account = g.account
+    notifications_count = count_account_notifications(account.id)
+    props = AccountPageProps(
+        account=g.account,
+        notifications_count=notifications_count
+    )
+
+    return make_response(render_template(
+        'account/home.html',
+        props = props
+    ), 200)
+
+@account.get('/account/notifications')
+def get_notifications():
+    notifications = []
+    props = NotificationsProps(
+        notications= notifications
+    )
+
+    return make_response(render_template(
+        'account/notifications.html',
+        props = props
+    ), 200)
 
 @account.get('/account/login')
 def get_login():
@@ -63,7 +99,7 @@ def logout():
         session.pop('account_id')
     return redirect(url_for('artists.list'))
 
-@account.route('/account/register', methods=['GET'])
+@account.get('/account/register')
 def get_register():
     props = {
         'currentPage': 'login',
@@ -83,7 +119,7 @@ def get_register():
         props = props
     ), 200)
 
-@account.route('/account/register', methods=['POST'])
+@account.post('/account/register')
 def post_register():
     props = {
         'query_string': ''
@@ -143,18 +179,6 @@ def post_register():
 
     return make_response(render_template(
         'account/register.html',
-        props = props
-    ), 200)
-
-@account.route('/account')
-def get_account():
-    account = load_account()
-    if account is None:
-        return redirect(url_for('account.get_login'))
-    props = AccountPageProps(account=account)
-
-    return make_response(render_template(
-        'account/home.html',
         props = props
     ), 200)
 

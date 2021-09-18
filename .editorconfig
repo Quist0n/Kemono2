@@ -5,3 +5,19 @@ root = true
 [*.py]
 indent_style = space
 indent_size = 4
+
+[*.html]
+indent_style = space
+indent_size = 2
+
+[*.svg]
+indent_style = space
+indent_size = 2
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[*.scss]
+indent_style = space
+indent_size = 2

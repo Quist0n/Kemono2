@@ -35,14 +35,3 @@ def get_cursor() -> cursor:
         g.connection = pool.getconn()
         g.cursor = g.connection.cursor()
     return g.cursor
-
-def get_locked_cursor() -> cursor:
-    """
-    TODO: get rid of it after implementing proper rollbacks.
-    """
-    connection_lock.acquire()
-    if 'cursor' not in g:
-        g.connection_lock = connection_lock
-        g.connection = pool.getconn()
-        g.cursor = g.connection.cursor()
-    return g.cursor

@@ -1,0 +1,38 @@
+{% extends 'components/shell.html' %}
+
+{% set notification_types = {
+  1: ACCOUNT_ROLE_CHANGE
+} %}
+
+{% block title %}
+  <title>Account notificatons</title>
+{% endblock title %}
+
+{% block content %}
+<section class="site-section site-section--account-notifications">
+  <header class="site-section__header">
+    <h1 class="site-section__heading">
+      Notifications
+    </h1>
+  </header>
+  <ul class="notifications__list">
+    {% for notification in props.notifications %}
+      {{ notification_item(notification) }}
+    {% else %}
+      <li class="notifications__item">
+        There are no notifications.
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock content %}
+
+{% macro notification_item(notification) %}
+  <li class="notifications__item">
+    {{ notification_types[notification.type](notification.extra_info) }}
+  </li>
+  
+{% endmacro %}
+
+{% macro ACCOUNT_ROLE_CHANGE(extra_info) %}
+{% endmacro %}
