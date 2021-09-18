@@ -23,6 +23,9 @@ def count_account_notifications(account_id: int) -> int:
     return notifications_count
 
 def get_account_notifications(account_id: int):
+    """
+    TODO: caching
+    """
     args_dict = {
         "account_id": account_id
     }

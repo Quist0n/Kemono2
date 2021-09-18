@@ -17,7 +17,7 @@ def get_dashboard():
     props = mod_props.Dashboard()
 
     response = make_response(render_template(
-        'moderator_dashboard.html',
+        'account/moderator/dashboard.html',
         props = props,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
