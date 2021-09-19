@@ -2,7 +2,17 @@
 {% from 'components/timestamp.html' import timestamp %}
 {% from 'components/tooltip.html' import tooltip %}
 {% from 'components/links.html' import fancy_link %}
-{% from 'components/tooltip.html' import register_message%}
+{% from 'components/tooltip.html' import register_message %}
+{% from 'components/navigation.html' import navigation, nav_list, nav_item %}
+{% from 'components/buttons.html' import button %}
+
+{% macro global_nav_item(link, text=link) %}
+  {{ nav_item(
+    link=link,
+    text=text,
+    class_name="global-nav__item"
+  ) }}
+{% endmacro %}
 
 <!DOCTYPE html>
 <html prefix="og: https://ogp.me/ns#">
@@ -85,18 +95,60 @@
   </head>
   <body>
     <header class="global-header">
-      <ul class="header">
-        <li><a href="/">[Home]</a></li>
-        <li><a href="/artists">[Artists]</a></li>
-        <li><a href="/artists/updated">[Recently Updated Artists]</a></li>
-        <li><a href="/posts">[Recent Posts]</a></li>
-        <li><a href="/dms">[Recent DMs]</a></li>
-        <li><a href="/importer">[Import]</a></li>
-        <li><a href="/requests">[Requests]</a></li>
-        <div id="account-buttons" style="display: inline-block;"></div>
-      </ul>
-      {% include 'components/subheader.html' %}
-      {% include 'components/flash_messages.html' %}
+      {% block header %}
+        {% call navigation(id="global-nav", class_name="global-nav") %}
+          
+          {% call nav_list(class_name="global-nav__list") %}
+            {{ global_nav_item('/', 'Home') }}
+
+            {% call nav_item(class_name="global-nav__item") %}
+              {{ button('Artists', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+                {{ global_nav_item('/artists', 'Artist List') }}
+                {{ global_nav_item('/artists/updated', 'Recently Updated Artists') }}
+                {{ global_nav_item('/artists/random', 'Random Artist') }}
+              {% endcall %}
+            {% endcall %}
+
+            {% call nav_item(class_name="global-nav__item") %}
+              {{ button('Posts', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+                {{ global_nav_item('/posts', 'Recent Posts') }}
+              {% endcall %}
+            {% endcall %}
+
+            {% call nav_item(class_name="global-nav__item") %}
+              {{ button('DMs', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+                {{ global_nav_item('/dms', 'Recent DMs') }}
+              {% endcall %}
+            {% endcall %}
+
+            {# {% call nav_item(class_name="global-nav__item") %}
+              {{ button('Requests', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+                {{ global_nav_item('/requests', 'Request List') }}
+                {{ global_nav_item('/requests/new', 'Post New Request') }}
+              {% endcall %}
+            {% endcall %} #}
+
+            {% call nav_item(class_name="global-nav__item") %}
+              {{ button('Import', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+                {{ global_nav_item('/importer', 'Import') }}
+              {% endcall %}
+            {% endcall %}
+
+            {% call nav_item(class_name="global-nav__item global-nav__item--account") %}
+              {{ button('Account', class_name="global-nav__button") }}
+              {% call nav_list(class_name="global-nav__list") %}
+              {% endcall %}
+            {% endcall %}
+          {% endcall %}
+          {{ button('Navigation', class_name="global-nav__switch") }}
+        {% endcall %}
+        {% include 'components/flash_messages.html' %}
+      {% endblock header %}
     </header>
 
     <main class="main" id="main">
@@ -114,6 +166,7 @@
         {{ register_message("") }}
         {{ timestamp("") }}
         {{ loading_icon() }}
+        {{ global_nav_item("") }}
         {% block components %}
         {% endblock components %}
       </div>

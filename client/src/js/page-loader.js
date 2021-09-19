@@ -3,7 +3,7 @@ import { initComponentFactory } from "./component-factory";
 
 /**
  * Initialises the scripts on the page.
- * @param {Map<string, (section: HTMLElement) => void>} pages The list of page names and their callbacks.
+ * @param {Map<string, (section: HTMLElement) => void>} pages The map of page names and their callbacks.
  */
 export function initSections(pages) {
   const header = document.querySelector(".global-header");
@@ -17,8 +17,8 @@ export function initSections(pages) {
    */
   const sections = main.querySelectorAll("main > .site-section");
 
-  initShell(header);
   initComponentFactory(footer);
+  initShell(header);
   sections.forEach(section => {
     const sectionName = /site-section--([a-z\-]+)/i.exec(section.className)[1];
 

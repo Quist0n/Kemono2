@@ -9,7 +9,8 @@ import { postsPage } from "./posts";
 import { artistsPage } from "./artists";
 import { uploadPage } from "./upload";
 import { updatedPage } from "./updated";
-
+export { adminPageScripts } from "./account/administrator/_index.js";
+export { moderatorPageScripts } from "./account/moderator/_index.js";
 /**
  * The map of page names and their callbacks.
  */
