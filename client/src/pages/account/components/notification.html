@@ -1,3 +1,5 @@
+{% from 'components/timestamp.html' import timestamp %}  
+
 {% macro ACCOUNT_ROLE_CHANGE(extra_info) %}
   Your role was changed from {{ extra_info.old_role }} to {{ extra_info.new_role }}.
 {% endmacro %}
