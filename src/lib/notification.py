@@ -1,10 +1,8 @@
-import copy
-import dateutil
-import ujson
+from ujson import dumps
 
 from typing import Dict, List, Optional
 
-from src.internals.cache.redis import get_conn
+from src.internals.cache.redis import get_conn, serialize_dict_list, deserialize_dict_list
 from src.internals.database.database import get_cursor
 
 from src.types.account import Notification
@@ -12,7 +10,7 @@ from src.types.account import Notification
 def count_account_notifications(account_id: int) -> int:
     args_dict = {
         "account_id": account_id
-    }
+        }
 
     cursor = get_cursor()
     query = """
@@ -48,10 +46,10 @@ def get_account_notifications(account_id: int, reload: bool = False) -> List[Not
         result = cursor.fetchall()
 
         notifications = [Notification.init_from_dict(notification) for notification in result]
-        redis.set(key, serialize_notifications(result), ex = 60)
+        redis.set(key, serialize_dict_list(result), ex = 60)
 
     else:
-        notifications = deserialize_notifications(notifications)
+        notifications = deserialize_dict_list(notifications)
 
     return notifications
 
@@ -66,7 +64,7 @@ def send_notifications(
         return False
 
     if extra_info is not None:
-        extra_info = ujson.dumps(extra_info)
+        extra_info = dumps(extra_info)
         notification_values = f"(%s, {notification_type}, '{extra_info}')"
     else:
         notification_values = f"(%s, {notification_type}, NULL)"
@@ -80,30 +78,3 @@ def send_notifications(
     cursor.execute(insert_query, account_ids)
 
     return True
-
-def serialize_notification(notification):
-    if notification is not None:
-        notification = prepare_notification_fields(copy.deepcopy(notification))
-    return ujson.dumps(notification)
-
-def deserialize_notification(notification_str):
-    notification = ujson.loads(notification_str)
-    if notification is not None:
-        notification = rebuild_notification_fields(notification)
-    return notification
-
-def serialize_notifications(notifications):
-    notifications = copy.deepcopy(notifications)
-    return ujson.dumps(list(map(lambda notification: prepare_notification_fields(notification), notifications)))
-
-def deserialize_notifications(notifications_str):
-    notifications = ujson.loads(notifications_str)
-    return list(map(lambda notification: rebuild_notification_fields(notification), notifications))
-
-def prepare_notification_fields(notification):
-    notification['created_at'] = notification['created_at'].isoformat()
-    return notification
-
-def rebuild_notification_fields(notification):
-    notification['created_at'] = dateutil.parser.parse(notification['created_at'])
-    return notification
