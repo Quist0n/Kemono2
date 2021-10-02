@@ -5,6 +5,7 @@ from flask import Blueprint, request, make_response, render_template, current_ap
 from configs.derived_vars import archiver_origin
 from src.lib.dms import get_unapproved_dms, approve_dm, cleanup_unapproved_dms
 
+from src.types.props import SuccessProps
 from .importer_types import DMPageProps, StatusPageProps
 
 importer_page = Blueprint('importer_page', __name__)
@@ -144,10 +145,11 @@ def importer_submit():
 
         response.raise_for_status()
         import_id = response.text
-        props = {
-            'currentPage': 'import',
-            'redirect': f'/importer/status/{import_id}{ "?dms=1" if request.form.get("save_dms") else "" }'
-        }
+        props = SuccessProps(
+            currentPage= 'import',
+            redirect= f'/importer/status/{import_id}{ "?dms=1" if request.form.get("save_dms") else "" }'
+        )
+
         return make_response(render_template(
             'success.html',
             props = props
