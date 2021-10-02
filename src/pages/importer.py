@@ -1,8 +1,10 @@
-from flask import Blueprint, request, make_response, render_template, current_app, g, session
-
 import requests
 from os import getenv
-from ..lib.dms import get_unapproved_dms, approve_dm, cleanup_unapproved_dms
+from flask import Blueprint, request, make_response, render_template, current_app, g, session
+
+from configs.derived_vars import archiver_origin
+from src.lib.dms import get_unapproved_dms, approve_dm, cleanup_unapproved_dms
+
 from .importer_types import DMPageProps, StatusPageProps
 
 importer_page = Blueprint('importer_page', __name__)
@@ -122,29 +124,26 @@ def get_importer_logs(import_id):
         return f'Error while connecting to archiver.', 500
 
 ### API ###
-@importer_page.route('/api/import', methods=['POST'])
+@importer_page.post('/api/import')
 def importer_submit():
-    host = getenv('ARCHIVERHOST')
-    port = getenv('ARCHIVERPORT') if getenv('ARCHIVERPORT') else '8000'
-
     if not session.get('account_id') and request.form.get("save_dms"):
         return 'You must be logged in to import direct messages.', 401
-    
+
     try:
-        r = requests.post(
-            f'http://{host}:{port}/api/import',
-            data = {
-                'service': request.form.get("service"),
-                'session_key': request.form.get("session_key"),
-                'channel_ids': request.form.get("channel_ids"),
-                'save_session_key': request.form.get("save_session_key"),
-                'save_dms': request.form.get("save_dms"),
-                'contributor_id': session.get("account_id")
-            }
+        response = requests.post(
+            f'{archiver_origin}/api/import',
+            data = dict(
+                service= request.form.get("service"),
+                session_key= request.form.get("session_key"),
+                channel_ids= request.form.get("channel_ids"),
+                save_session_key= request.form.get("save_session_key"),
+                save_dms= request.form.get("save_dms"),
+                contributor_id= session.get("account_id")
+            )
         )
 
-        r.raise_for_status()
-        import_id = r.text
+        response.raise_for_status()
+        import_id = response.text
         props = {
             'currentPage': 'import',
             'redirect': f'/importer/status/{import_id}{ "?dms=1" if request.form.get("save_dms") else "" }'
