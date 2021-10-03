@@ -1,21 +1,28 @@
 {% extends 'dev_only/shell.html' %}
 
 {% block content %}
-  <section class="site__section site__section--dev-only">
+  <section class="site__section site__section--development">
     <header class="site__header">
       <h1 class="site__heading">Kemono dev</h1>
     </header>
-    <form 
+    <nav>
+      <ul>
+        <li>
+          <a href="/development/test-entries">Test DB</a>
+        </li>
+      </ul>
+    </nav>
+    <form
       id="dev-activator"
       class="form"
-      action="/dev-only" 
+      action="/development"
       method="POST"
     >
       <div class="form__section">
         <p>Press "Activate" to:</p>
         <ul>
           <li>Add test accounts</li>
-        </ul> 
+        </ul>
       </div>
       <div class="form__section">
         <button class="form__button form__button--submit" type="submit">

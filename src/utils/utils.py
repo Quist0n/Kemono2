@@ -3,6 +3,8 @@ from datetime import datetime
 from flask import request, g
 import json
 
+from configs.derived_vars import is_development
+
 freesites = {
     "kemono": {
         "title": "Kemono",
@@ -24,8 +26,11 @@ paysite_list = [
     "subscribestar",
     "dlsite",
     "discord",
-    "fantia"
+    "fantia",
 ]
+# if is_development:
+#     paysite_list.append('kemono-dev')
+
 # because fanbox requires `post_id` and `artist_id` for post link
 # any generic call to `paysite.post.link()` should have 2 arguments
 paysites = {
