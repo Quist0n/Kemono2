@@ -44,7 +44,7 @@ def test_entries():
     )
 
     response = make_response(render_template(
-        'development/test-entries.html',
+        'development/test_entries.html',
         props = props
     ), 200)
     return response

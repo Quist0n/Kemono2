@@ -3,7 +3,7 @@
   {% block bundler_output %}
     {# quick hack until writing proper loader #}
       <% for (const css in htmlWebpackPlugin.files.css) { %>
-      <% if (htmlWebpackPlugin.files.css[css].startsWith("/static/bundle/css/dev-only")) { %>
+      <% if (htmlWebpackPlugin.files.css[css].startsWith("/static/bundle/css/development")) { %>
         <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.css[css] %>">
       <% } %>
     <% } %>
