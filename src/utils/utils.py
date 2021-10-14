@@ -28,8 +28,6 @@ paysite_list = [
     "discord",
     "fantia",
 ]
-# if is_development:
-#     paysite_list.append('kemono-dev')
 
 # because fanbox requires `post_id` and `artist_id` for post link
 # any generic call to `paysite.post.link()` should have 2 arguments
@@ -194,7 +192,7 @@ def offset(num, l):
         return []
     return l[num:]
 
-def limit_int(i, limit):
+def limit_int(i: int, limit: int):
     if i > limit:
         return limit
     return i
@@ -207,3 +205,9 @@ def parse_int(string, default = 0):
 
 def render_page_data():
     return json.dumps(g.page_data)
+
+# doing it in the end to avoid circular import error
+if is_development:
+    from src.dev_only.internals import service_name, kemono_dev
+    paysite_list.append(service_name)
+    paysites[service_name] = kemono_dev

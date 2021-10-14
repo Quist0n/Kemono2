@@ -1,26 +1,33 @@
-from flask import session, current_app, flash
-
-from ..internals.database.database import get_cursor
-from ..utils.utils import get_value
-from ..internals.cache.redis import get_conn
-from ..lib.favorites import add_favorite_artist
-from ..lib.artist import get_artist
-from ..lib.security import is_login_rate_limited
-
 import ujson
 import copy
 import bcrypt
 import base64
 import hashlib
 import dateutil
+from flask import session, current_app, flash
 from threading import Lock
 from bleach.sanitizer import Cleaner
+
+from src.types.account import Service_Key
+
+from ..internals.database.database import get_cursor
+from ..utils.utils import get_value
+from ..internals.cache.redis import get_conn, serialize_dict_list, deserialize_dict_list
+from ..lib.favorites import add_favorite_artist
+from ..lib.artist import get_artist
+from ..lib.security import is_login_rate_limited
+
+from typing import Dict, List
+from src.types.account import Account, Service_Key
 
 from typing import Dict, List, Optional
 
 account_create_lock = Lock()
 
-def load_account(account_id = None, reload = False):
+def load_account(account_id: str = None, reload: bool = False):
+    """
+    TODO: Make it return an instance of `Account`.
+    """
     if account_id is None and 'account_id' in session:
         return load_account(session['account_id'], reload)
     elif account_id is None and 'account_id' not in session:
@@ -31,7 +38,11 @@ def load_account(account_id = None, reload = False):
     account = redis.get(key)
     if account is None or reload:
         cursor = get_cursor()
-        query = 'select id, username, created_at from account where id = %s'
+        query = """
+            SELECT id, username, created_at, role
+            FROM account
+            WHERE id = %s
+        """
         cursor.execute(query, (account_id,))
         account = cursor.fetchone()
         redis.set(key, serialize_account(account))
@@ -40,9 +51,83 @@ def load_account(account_id = None, reload = False):
 
     return account
 
+def get_saved_key_import_ids(key_id, reload = False):
+    redis = get_conn()
+    key = 'saved_key_import_ids:' + str(key_id)
+    saved_key_import_ids = redis.get(key)
+    if saved_key_import_ids is None or reload:
+        cursor = get_cursor()
+        # TODO: select columns
+        query = """
+            SELECT *
+            FROM saved_session_key_import_ids
+            WHERE key_id = %s
+        """
+        cursor.execute(query, (int(key_id),))
+        saved_key_import_ids = cursor.fetchall()
+        redis.set(key, serialize_dict_list(saved_key_import_ids), ex = 3600)
+    else:
+        saved_key_import_ids = deserialize_dict_list(saved_key_import_ids)
+
+    return saved_key_import_ids
+
+def get_saved_keys(account_id: int, reload: bool = False):
+    redis = get_conn()
+    key = 'saved_keys:' + str(account_id)
+    saved_keys = redis.get(key)
+    result = None
+    if saved_keys is None or reload:
+        cursor = get_cursor()
+        args_dict = dict(
+            account_id= str(account_id)
+        )
+        query = """
+            SELECT id, service, discord_channel_ids, added, dead
+            FROM saved_session_keys
+            WHERE contributor_id = %(account_id)s
+            ORDER BY
+                added DESC
+        """
+        cursor.execute(query, args_dict)
+        result = cursor.fetchall()
+        redis.set(key, serialize_dict_list(result), ex=3600)
+    else:
+        result = deserialize_dict_list(saved_keys)
+    saved_keys = [Service_Key.init_from_dict(service_key) for service_key in result]
+    return saved_keys
+
+def revoke_saved_keys(key_ids: List[int], account_id: int):
+    cursor = get_cursor()
+    query_args = dict(
+        key_ids= key_ids,
+        account_id = account_id
+    )
+    query1 = """
+        DELETE
+        FROM saved_session_key_import_ids skid
+        USING saved_session_keys sk
+        WHERE
+            skid.key_id = sk.id
+            AND sk.id = ANY (%(key_ids)s)
+            AND sk.contributor_id = %(account_id)s
+    """
+    cursor.execute(query1, query_args)
+    query2 = """
+        DELETE
+        FROM saved_session_keys
+        WHERE
+            id = ANY (%(key_ids)s)
+            AND contributor_id = %(account_id)s
+    """
+    cursor.execute(query2, query_args)
+    redis = get_conn()
+    key = 'saved_keys:' + str(account_id)
+    redis.delete(key)
+    return True
+
 def get_login_info_for_username(username):
     cursor = get_cursor()
-    query = 'select id, password_hash from account where username = %s'
+    query = 'SELECT id, password_hash FROM account WHERE username = %s'
     cursor.execute(query, (username,))
     return cursor.fetchone()
 
@@ -53,7 +138,7 @@ def is_logged_in():
 
 def is_username_taken(username):
     cursor = get_cursor()
-    query = 'select id from account where username = %s'
+    query = 'SELECT id FROM account WHERE username = %s'
     cursor.execute(query, (username,))
     return cursor.fetchone() is not None
 
@@ -68,9 +153,21 @@ def create_account(username: str, password: str, favorites: Optional[List[Dict]]
         scrub = Cleaner(tags = [])
 
         cursor = get_cursor()
-        query = "insert into account (username, password_hash) values (%s, %s) returning id"
+        query = """
+            INSERT INTO account (username, password_hash)
+            VALUES (%s, %s)
+            RETURNING id
+        """
         cursor.execute(query, (scrub.clean(username), password_hash,))
         account_id = cursor.fetchone()['id']
+        if (account_id == 1):
+            cursor = get_cursor()
+            query = """
+                UPDATE account
+                SET role = 'administrator'
+                WHERE id = 1
+            """
+            cursor.execute(query)
     finally:
         account_create_lock.release()
 
@@ -104,7 +201,7 @@ def attempt_login(username, password):
     flash('Username or password is incorrect')
     return False
 
-def get_base_password_hash(password):
+def get_base_password_hash(password: str):
     return base64.b64encode(hashlib.sha256(password.encode('utf-8')).digest())
 
 def serialize_account(account):

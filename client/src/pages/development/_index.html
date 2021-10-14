@@ -1,34 +1,44 @@
 {% extends 'development/shell.html' %}
 
+{% import 'components/site.html' as site %}
+
 {% block content %}
-  <section class="site__section site__section--development">
-    <header class="site__header">
-      <h1 class="site__heading">Kemono dev</h1>
-    </header>
-    <nav>
+{% call site.section('dev-only', 'Kemono dev') %}
+  <form
+    id="dev-activator"
+    class="form"
+    action="/dev-only"
+    method="POST"
+  >
+    <div class="form__section">
+      <p>Press "Activate" to:</p>
       <ul>
-        <li>
-          <a href="/development/test-entries">Test DB</a>
-        </li>
+        <li>Add test accounts</li>
       </ul>
-    </nav>
-    <form
-      id="dev-activator"
-      class="form"
-      action="/development"
-      method="POST"
-    >
-      <div class="form__section">
-        <p>Press "Activate" to:</p>
-        <ul>
-          <li>Add test accounts</li>
-        </ul>
-      </div>
-      <div class="form__section">
-        <button class="form__button form__button--submit" type="submit">
-          Activate
-        </button>
-      </div>
-    </form>
-  </section>
+    </div>
+    <div class="form__section">
+      <button class="form__button form__button--submit" type="submit">
+        Activate
+      </button>
+    </div>
+  </form>
+  <form
+    id="dev-service-keys"
+    class="form"
+    action="/dev-only/service-keys"
+    method="POST"
+  >
+    <div class="form__section">
+      <p>Press "Activate" to:</p>
+      <ul>
+        <li>Add test service keys</li>
+      </ul>
+    </div>
+    <div class="form__section">
+      <button class="form__button form__button--submit" type="submit">
+        Activate
+      </button>
+    </div>
+  </form>
+{% endcall %}
 {% endblock content %}

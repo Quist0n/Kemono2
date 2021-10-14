@@ -155,7 +155,7 @@
                 </div>
               {% endif %}
               <p class="comment__message">
-                {{ comment.content | safe }}
+                {{ comment.content }}
               </p>
             </section>
             <footer class="comment__footer">
@@ -202,12 +202,10 @@
     <h2>Downloads</h2>
     <ul class="post__attachments">
       {% for attachment in attachments %}
-        {% set filename = '['~ artist_name ~ '(' ~ props.service ~ ')]-' ~ attachment.stem ~ '-[' ~ post.user ~ '-' ~ post.id ~ ']' ~ attachment.extension %}
         <li class="post__attachment">
           <a
             class="post__attachment-link"
-            href="{{ attachment.path }}" 
-            download="{{ filename }}"
+            href="/data{{ attachment.path }}?f={{ attachment.name }}" 
           >
             Download {{ attachment.name }}
           </a>
@@ -232,11 +230,11 @@
       {% for preview in previews %}
         {% if preview.type == 'thumbnail' %}
           <div class="post__thumbnail">
-            <a class="fileThumb" href="{{ preview.path }}">
+            <a class="fileThumb" href="/data{{ preview.path }}?f={{ preview.name }}">
               {# TODO: move backup image logic to the script #}
               <img
-                data-src="/thumbnail{{ preview.path }}"
-                src="/thumbnail{{ preview.path }}"
+                data-src="/thumbnail/data{{ preview.path }}"
+                src="/thumbnail/data{{ preview.path }}"
                 loading="lazy"
               >
             </a>

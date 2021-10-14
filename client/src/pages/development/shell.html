@@ -11,7 +11,7 @@
       <script src="<%= htmlWebpackPlugin.files.chunks[chunk] %>"></script>
     <% } %>
     <% for (const scriptPath in htmlWebpackPlugin.files.js) { %>
-      <% if (htmlWebpackPlugin.files.js[scriptPath].startsWith("/static/bundle/js/dev-only") | htmlWebpackPlugin.files.js[scriptPath].startsWith("/static/bundle/js/runtime")) { %>
+      <% if (htmlWebpackPlugin.files.js[scriptPath].startsWith("/static/bundle/js/development") | htmlWebpackPlugin.files.js[scriptPath].startsWith("/static/bundle/js/runtime")) { %>
         <script src="<%= htmlWebpackPlugin.files.js[scriptPath] %>" defer></script>
       <% } %>
     <% } %>

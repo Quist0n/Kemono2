@@ -88,6 +88,8 @@ services:
     depends_on:
       kemono-db:
         condition: service_healthy
+    environment:
+      - FLASK_ENV=development
     volumes:
       - ./archiver:/app
       - ./kitsune.py:/app/config.py

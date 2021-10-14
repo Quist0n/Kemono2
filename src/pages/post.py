@@ -1,6 +1,6 @@
 from flask import Blueprint, request, make_response, render_template, redirect, url_for
 from pathlib import PurePath
-
+from bleach.sanitizer import Cleaner
 import datetime
 import re
 
@@ -68,11 +68,12 @@ def get(service, artist_id, post_id):
         if re.search("\.(gif|jpe?g|jpe|png|webp)$", post['file']['path'], re.IGNORECASE):
             previews.append({
                 'type': 'thumbnail',
+                'name': post['file']['name'],
                 'path': post['file']['path'].replace('https://kemono.party','')
             })
         else:
             attachments.append({
-                'path': post['file']['path'],
+                'path': post['file']['path'].replace('https://kemono.party',''),
                 'name': post['file'].get('name')
             })
     if len(post['embed']):
@@ -86,6 +87,7 @@ def get(service, artist_id, post_id):
         if re.search("\.(gif|jpe?g|jpe|png|webp)$", attachment['path'], re.IGNORECASE):
             previews.append({
                 'type': 'thumbnail',
+                'name': attachment['name'],
                 'path': attachment['path'].replace('https://kemono.party','')
             })
         else:
@@ -98,6 +100,18 @@ def get(service, artist_id, post_id):
                 'extension': file_extension,
                 'stem': stem
             })
+    scrub = Cleaner(
+        tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'strong', 'ul',
+        'img', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'span', 'ul', 'ol', 'li'],
+        attributes = {
+            'a': ['href', 'title'],
+            'abbr': ['title'],
+            'acronym': ['title'],
+            'img': ['src']
+        },
+        strip=True
+    )
+    post['content'] = scrub.clean(post['content'])
 
     props['artist'] = artist
     props['flagged'] = is_post_flagged(service, artist_id, post_id)

@@ -1,1 +1,1 @@
-service_name = 'kemono-dev'
+from .service import service_name, kemono_dev
