@@ -8,14 +8,9 @@ from development.lib.test_accounts import register_test_accounts, write_test_acc
 from src.types.account import Account
 from src.types.props import SuccessProps
 
-development = Blueprint('development', __name__)
+config = Blueprint('config', __name__)
 
-@development.before_request
-def check_creds():
-    if not g.get('account'):
-        return redirect(url_for('account.get_login'))
-
-@development.get('/development')
+@config.get('/config')
 def main_page():
     props = dict(
         currentPage= 'development'
@@ -27,7 +22,7 @@ def main_page():
     ), 200)
     return response
 
-@development.post('/development')
+@config.post('/config')
 def activate_dev_mode():
     accounts = register_test_accounts()
     print(f"Registered {len(accounts)} accounts.")
@@ -43,7 +38,7 @@ def activate_dev_mode():
     ), 200)
     return response
 
-@development.post('/dev-only/service-keys')
+@config.post('/config/service-keys')
 def generate_service_keys():
     account: Account = g.account
     try:
@@ -66,7 +61,7 @@ def generate_service_keys():
         current_app.logger.exception('Error connecting to archver')
         return f'Error while connecting to archiver. Is it running?', 500
 
-@development.get('/development/test-entries')
+@config.get('/config/test-entries')
 def test_entries():
     props = dict(
         currentPage= 'development'
@@ -78,7 +73,7 @@ def test_entries():
     ), 200)
     return response
 
-@development.post('/development/test-entries')
+@config.post('/config/test-entries')
 def test_import():
     account: Account = g.account
     try:

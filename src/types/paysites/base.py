@@ -26,6 +26,7 @@ class Service_Post(AbstractDataclass):
 
 @dataclass
 class Paysite(AbstractDataclass):
+    name: str
     title: str
     user: Service_User
     post: Service_Post

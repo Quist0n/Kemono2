@@ -9,5 +9,5 @@ if (is_development):
 ```
 """
 
-from .internals import service_name
-from .endpoints import development
+from .internals import Kemono_Dev, kemono_dev
+from .blueprints import development

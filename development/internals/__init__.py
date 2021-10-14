@@ -1,1 +1,3 @@
-from .service import service_name, kemono_dev
+from .service import Kemono_Dev
+
+kemono_dev = Kemono_Dev()

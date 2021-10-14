@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from src.types.paysites import Paysite, Service_User, Service_Post
+from .base import Paysite, Service_User, Service_Post
 
 @dataclass
 class User(Service_User):
@@ -12,8 +12,11 @@ class Post(Service_Post):
         return f""
 
 @dataclass
-class Kemono_Dev(Paysite):
-    name: str = 'kemono-dev'
-    title: str = 'Kemono Dev'
+class Discord(Paysite):
+    """
+    TODO: finish links.
+    """
+    name: str = 'discord'
+    title: str = 'Discord'
     user: User = User()
     post: Post = Post()
