@@ -26,6 +26,9 @@ class Service_Post(AbstractDataclass):
 
 @dataclass
 class Paysite(AbstractDataclass):
+    """
+    Holds all info related to the paysite.
+    """
     name: str
     title: str
     user: Service_User

@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-
-from src.internals.types import AbstractDataclass
 # from .base import Paysite
 from .discord import Discord
 from .dlsite import DLSite
@@ -12,12 +9,11 @@ from .subscribestar import Subscribestar
 
 # from typing import List
 
-@dataclass
-class Paysites(AbstractDataclass):
-    discord: Discord = Discord()
-    dlsite: DLSite = DLSite()
-    fanbox: Fanbox = Fanbox()
-    fantia: Fantia = Fantia()
-    gumroad: Gumroad = Gumroad()
-    patreon: Patreon = Patreon()
-    subscribestar: Subscribestar = Subscribestar()
+class Paysites:
+    discord = Discord()
+    dlsite = DLSite()
+    fanbox = Fanbox()
+    fantia = Fantia()
+    gumroad = Gumroad()
+    patreon = Patreon()
+    subscribestar = Subscribestar()

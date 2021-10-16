@@ -145,4 +145,4 @@ def render_page_data():
 if is_development:
     from development import kemono_dev
     paysite_list.append(kemono_dev.name)
-    paysites[kemono_dev.name] = kemono_dev
+    setattr(paysites, kemono_dev.name, kemono_dev)

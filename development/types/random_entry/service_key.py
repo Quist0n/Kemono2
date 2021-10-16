@@ -1,6 +1,6 @@
 from flask import g
 
-from src.dev_only.internals import service_name
+from development.internals import kemono_dev
 from src.utils.random import generate_random_boolean, generate_random_number, generate_random_date
 from src.types.account import Service_Key
 
@@ -15,7 +15,7 @@ class Random_Service_key(Service_Key):
     def __init__(self):
         self.id = generate_random_number()
         self.contributor_id = g.account.id if g.get('account') else generate_random_number()
-        self.service = service_name
+        self.service = kemono_dev.name
         self.added = generate_random_date()
         self.dead = generate_random_boolean()
         self.discord_channel_ids = generate_discord_ids()

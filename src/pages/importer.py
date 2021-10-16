@@ -54,7 +54,7 @@ def importer_status(import_id):
     dms = request.args.get('dms')
 
     props = StatusPageProps(
-        current_page='import',
+        currentPage='import',
         import_id=import_id,
         dms=dms
     )
