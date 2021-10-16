@@ -62,9 +62,10 @@ def test_import():
         )
 
         response.raise_for_status()
+        import_id = response.text
         props = SuccessProps(
             currentPage= 'development',
-            redirect= f'/development/config'
+            redirect= f'/importer/status/{import_id}?dms=1'
         )
 
         return make_response(render_template(
