@@ -7,7 +7,7 @@
     {% call nav_list() %}
       {% for url, title in nav_items %}
         {% call nav_item() %}
-          {{ kemono_link(url, title) }}
+          {{ kemono_link(url, title, is_noop= false) }}
         {% endcall %}
       {% endfor %}
     {% endcall %}

@@ -1,6 +1,6 @@
 from flask import Blueprint, g, redirect, url_for, make_response, render_template
 
-from .pages import config
+from .pages import config, test_entries
 
 development = Blueprint('development', __name__)
 
@@ -22,3 +22,4 @@ def get_dev_page():
     return response
 
 development.register_blueprint(config, url_prefix='/development')
+development.register_blueprint(test_entries, url_prefix='/development')

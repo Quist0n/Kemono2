@@ -4,16 +4,16 @@
 {% from 'development/components/nav.html' import dev_nav %}
 
 {% set nav_items = [
-  ('/development/config', 'Config')
+  ('/development', 'Home')
 ] %}
 
 {% block content %}
-{% call site.section('dev-only', 'Kemono dev') %}
+{% call site.section('test-entries', 'Test entries') %}
   {{ dev_nav(nav_items) }}
   <form
-    id="test-entries"
+    id="seeded-entries"
     class="form"
-    action="/development/config/test-entries"
+    action="/development/test-entries/seeded"
     method="POST"
     target="_blank"
   >
@@ -30,9 +30,9 @@
   </form>
 
   <form
-    id="test-entries"
+    id="random-entries"
     class="form"
-    action="/development/config/test-entries"
+    action="/development/test-entries/random"
     method="POST"
     target="_blank"
   >

@@ -50,31 +50,6 @@ def test_entries():
     ), 200)
     return response
 
-@config.post('/config/test-entries')
-def test_import():
-    account: Account = g.account
-    try:
-        response = requests.post(
-            f'{archiver_origin}/development/test-entries',
-            data = dict(
-                account_id= str(account.id)
-            )
-        )
-
-        response.raise_for_status()
-        import_id = response.text
-        props = SuccessProps(
-            currentPage= 'development',
-            redirect= f'/importer/status/{import_id}?dms=1'
-        )
-
-        return make_response(render_template(
-            'success.html',
-            props = props
-        ), 200)
-    except Exception as e:
-        current_app.logger.exception('Error connecting to archver')
-        return f'Error while connecting to archiver. Is it running?', 500
 
 @config.post('/config/service-keys')
 def generate_service_keys():
