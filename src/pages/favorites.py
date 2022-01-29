@@ -8,23 +8,13 @@ from ..internals.cache.flask_cache import cache
 
 favorites = Blueprint('favorites', __name__)
 
+# TODO: Fix redirecting to correct endpoint leading to being redirected to it on login
+
+
 @favorites.route('/api/favorites', methods=['GET'])
 def api_list():
-    account = load_account()
-    if account is None:
-        return "", 401
+    return redirect(url_for('api.v1.account_api.list_account_favorites'), 302)
 
-    favorites = []
-    fave_type = get_value(request.args, 'type', 'artist')
-    if fave_type == 'post':
-        favorites = get_favorite_posts(account['id'])
-    else:
-        favorites = get_favorite_artists(account['id'])
-
-    results = favorites
-    response = make_response(jsonify(results), 200)
-    response.headers['Cache-Control'] = 's-maxage=60'
-    return response
 
 @favorites.route('/favorites', methods=['GET'])
 def list():
