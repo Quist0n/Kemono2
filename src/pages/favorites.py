@@ -1,19 +1,12 @@
-from flask import Blueprint, request, make_response, render_template, session, redirect, flash, url_for, current_app, jsonify
+from flask import Blueprint, request, make_response, render_template, redirect, flash, url_for
 
-from ..utils.utils import make_cache_key, get_value, restrict_value, sort_dict_list_by, take, offset, parse_int
-from ..lib.account import load_account
-from ..lib.favorites import get_favorite_artists, get_favorite_posts, add_favorite_post, add_favorite_artist, remove_favorite_post, remove_favorite_artist
-from ..lib.security import is_password_compromised
-from ..internals.cache.flask_cache import cache
+from src.utils.utils import make_cache_key, get_value, restrict_value, sort_dict_list_by, take, offset, parse_int
+from src.lib.account import load_account
+from src.lib.favorites import get_favorite_artists, get_favorite_posts, add_favorite_post, add_favorite_artist, remove_favorite_post, remove_favorite_artist
+from src.lib.security import is_password_compromised
+from src.internals.cache.flask_cache import cache
 
 favorites = Blueprint('favorites', __name__)
-
-# TODO: Fix redirecting to correct endpoint leading to being redirected to it on login
-
-
-@favorites.route('/api/favorites', methods=['GET'])
-def api_list():
-    return redirect(url_for('api.v1.account_api.list_account_favorites'), 302)
 
 
 @favorites.route('/favorites', methods=['GET'])
@@ -50,13 +43,14 @@ def list():
 
     response = make_response(render_template(
         'favorites.html',
-        props = props,
-        base = base,
-        source = 'account',
-        results = results,
+        props=props,
+        base=base,
+        source='account',
+        results=results,
     ), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
     return response
+
 
 @favorites.route('/favorites/post/<service>/<artist_id>/<post_id>', methods=['POST'])
 def post_favorite_post(service, artist_id, post_id):
@@ -66,6 +60,7 @@ def post_favorite_post(service, artist_id, post_id):
     add_favorite_post(account['id'], service, artist_id, post_id)
     return '', 200
 
+
 @favorites.route('/favorites/artist/<service>/<artist_id>', methods=['POST'])
 def post_favorite_artist(service, artist_id):
     account = load_account()
@@ -73,6 +68,7 @@ def post_favorite_artist(service, artist_id):
         return redirect(url_for('account.get_login'))
     add_favorite_artist(account['id'], service, artist_id)
     return '', 200
+
 
 @favorites.route('/favorites/post/<service>/<artist_id>/<post_id>', methods=['DELETE'])
 def delete_favorite_post(service, artist_id, post_id):
@@ -82,6 +78,7 @@ def delete_favorite_post(service, artist_id, post_id):
     remove_favorite_post(account['id'], service, artist_id, post_id)
     return '', 200
 
+
 @favorites.route('/favorites/artist/<service>/<artist_id>', methods=['DELETE'])
 def delete_favorite_artist(service, artist_id):
     account = load_account()
@@ -89,6 +86,7 @@ def delete_favorite_artist(service, artist_id):
         return redirect(url_for('account.get_login'))
     remove_favorite_artist(account['id'], service, artist_id)
     return '', 200
+
 
 def sort_and_filter_favorites(favorites, o, field, asc):
     favorites = sort_dict_list_by(favorites, field, not asc)
