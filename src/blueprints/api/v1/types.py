@@ -57,7 +57,7 @@ class PaginationInit:
     Pagination stats collected from request.
     """
 
-    def __init__(self, page: int = 1) -> None:
+    def __init__(self, page: int = 1, **kwargs) -> None:
         """
         The absence of `page` value means the last page.
         """
@@ -72,11 +72,11 @@ class PaginationDB:
 
     def __init__(self, pagination_init: PaginationInit, total_count: int) -> None:
         self.total_count = total_count
-        self.offset = self.calculate_offset(pagination_init.page)
+        self.offset = self.calculate_offset(pagination_init.page, total_count)
         self.limit = self.calculate_limit(total_count, self.offset)
 
     def calculate_offset(self, page: int, total_count: int):
-        offset = page - 1 * DEFAULT_PAGE_LIMIT
+        offset = (page - 1) * DEFAULT_PAGE_LIMIT
         return offset
 
     def calculate_limit(self, total: int, offset: int):
@@ -85,6 +85,12 @@ class PaginationDB:
         """
         limit = limit_int(total - offset, DEFAULT_PAGE_LIMIT)
         return limit
+
+    def get_info(self) -> dict:
+        return dict(
+            offset=self.offset,
+            limit=self.limit
+        )
 
 
 class PaginationClient:

@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, make_response, request
 from src.lib.account import load_account
 from src.lib.favorites import get_favorite_artists, get_favorite_posts
 from src.utils.utils import get_value, parse_int
-from .lib import get_artists, validate_artists_request
+from .lib import get_artists_by_name, validate_artists_request
 
 v1api = Blueprint('v1', __name__, url_prefix='/v1')
 
@@ -31,12 +31,16 @@ def list_account_favorites():
 @v1api.get("/artists")
 def list_artists():
     result = validate_artists_request(request)
+    service = request.args.get("service")
+    name = request.args.get("name")
 
     if (not result["is_successful"]):
         return make_response(jsonify(result["validation_errors"]), 422)
 
-    artists = get_artists(
-        pagination_init=result["data"]["pagination_init"]
+    artists = get_artists_by_name(
+        pagination_init=result["data"]["pagination_init"],
+        service=service,
+        name=name
     )
 
     response = make_response(jsonify(artists), 200)
