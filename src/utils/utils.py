@@ -100,9 +100,9 @@ def allowed_file(mime, accepted):
     return any(x in mime for x in accepted)
 
 
-def get_value(d, key, default=None):
-    if key in d:
-        return d[key]
+def get_value(dictionary, key, default=None):
+    if key in dictionary:
+        return dictionary[key]
     return default
 
 
@@ -140,13 +140,13 @@ def offset(num, list_var):
     return list_var[num:]
 
 
-def limit_int(i: int, limit: int):
-    if i > limit:
+def limit_int(integer: int, limit: int):
+    if integer > limit:
         return limit
-    return i
+    return integer
 
 
-def parse_int(string, default=0):
+def parse_int(string: str, default: int = 0):
     try:
         return int(string)
     except Exception:

@@ -1,9 +1,10 @@
-from flask import Blueprint, request, make_response, jsonify
+from flask import Blueprint, jsonify, make_response, request
+
 
 from src.lib.account import load_account
-from src.utils.utils import get_value, parse_int
 from src.lib.favorites import get_favorite_artists, get_favorite_posts
-from src.internals.database.database import get_cursor
+from src.utils.utils import get_value, parse_int
+from .lib import get_artists, validate_artists_request
 
 v1api = Blueprint('v1', __name__, url_prefix='/v1')
 
@@ -28,21 +29,17 @@ def list_account_favorites():
 
 
 @v1api.get("/artists")
-def list():
-    limit = parse_int(request.args.get('limit'), None) if request.args.get('limit') else None
-    if (limit is None):
-        query = "SELECT id, indexed, name, service, updated FROM lookup WHERE service != 'discord-channel'"
-        cursor = get_cursor()
-        cursor.execute(query)
-        results = cursor.fetchall()
-    else:
-        arg_dict = {'limit': limit}
-        query = "SELECT id, indexed, name, service, updated FROM lookup WHERE service != 'discord-channel' LIMIT %(limit)s"
-        cursor = get_cursor()
-        cursor.execute(query, arg_dict)
-        results = cursor.fetchall()
+def list_artists():
+    result = validate_artists_request(request)
 
-    response = make_response(jsonify(results), 200)
+    if (not result["is_successful"]):
+        return make_response(jsonify(result["validation_errors"]), 422)
+
+    artists = get_artists(
+        pagination_init=result["data"]["pagination_init"]
+    )
+
+    response = make_response(jsonify(artists), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
 
     return response
