@@ -57,7 +57,7 @@ class PaginationInit:
     Pagination stats collected from request.
     """
 
-    def __init__(self, page: int = 1, **kwargs) -> None:
+    def __init__(self, page: int = 1) -> None:
         """
         The absence of `page` value means the last page.
         """
@@ -107,3 +107,9 @@ class PaginationClient:
         """
         @TODO
         """
+
+
+class TDArtistListResult(TypedDict):
+    pagination_init: PaginationInit
+    name: Optional[str]
+    service: Optional[str]

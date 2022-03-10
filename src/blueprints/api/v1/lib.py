@@ -1,17 +1,15 @@
 import time
-
 from typing import List
 
 from flask import Request
 
-from src.internals.database.database import get_cursor
 from src.internals.cache.redis import (
-    get_conn,
     KemonoRedisLock,
-    serialize_dict_list,
-    deserialize_dict_list
+    deserialize_dict_list,
+    get_conn,
+    serialize_dict_list
 )
-
+from src.internals.database.database import get_cursor
 from src.utils.utils import paysite_list
 
 from .types import (
@@ -19,50 +17,40 @@ from .types import (
     PaginationDB,
     PaginationInit,
     TDArtistListParams,
-    ValidationResult
+    ValidationResult,
+    TDArtistListResult
 )
 
 
 def validate_artists_request(requestArg: Request):
     """
-    Validate parameters for artist search from request
+    Validate parameters for artist search from request.
     """
     search_params: TDArtistListParams = requestArg.args.to_dict()
-    # Validattions:
-    # - `name`
-    # - `service`
-    #     - if absent, search all services, otherwise only one
-    #     - is a string
-    #     - is a valid service name
-    pagination_init = PaginationInit(**search_params)
-    result_data = dict(
-        pagination_init=pagination_init
-    )
+    service = str(search_params["service"]).strip() if search_params.get("service") else None
+    page = int(search_params.get("page")) if search_params.get("page") else None
+    artist_name = str(search_params["name"]).strip() if search_params.get("name") else None
+    errors = []
 
-    service = search_params.get("service")
-    errors = None
-    is_valid = False
+    if service and service not in paysite_list:
+        errors.append(dict(message=f"Invalid service parameter. Service must be one of {paysite_list}"))
 
-    if service not in paysite_list and service is not None:
-
-        errors = [dict(message=f"Invalid service parameter. Service must be one of {paysite_list}")]
-
-    if not errors:
-        is_valid = True
-
-    if is_valid is True:
-        return ValidationResult(
-            is_successful=True,
-            data=result_data,
-            validation_errors=errors
-        )
-
-    else:
+    if errors:
         return ValidationResult(
             is_successful=False,
-            data=result_data,
             validation_errors=errors
         )
+
+    pagination_init = PaginationInit(page=page)
+    result_data = TDArtistListResult(
+        pagination_init=pagination_init,
+        name=artist_name
+    )
+
+    return ValidationResult(
+        is_successful=True,
+        data=result_data,
+    )
 
 
 def count_artists(service: str = None) -> int:
