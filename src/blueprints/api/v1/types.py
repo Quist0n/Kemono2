@@ -47,6 +47,9 @@ class TDArtistListParams(TypedDict):
 
 
 class ValidationResult(TypedDict):
+    """
+    TODO: Rewrite as a class with a generic.
+    """
     is_successful: bool
     data: Optional[Dict]
     validation_errors: Optional[List[Dict]]
@@ -77,6 +80,11 @@ class PaginationDB:
 
     def calculate_offset(self, page: int, total_count: int):
         offset = (page - 1) * DEFAULT_PAGE_LIMIT
+
+        # something-something offset should not be higher than total count
+        if (offset > total_count):
+            offset = total_count
+
         return offset
 
     def calculate_limit(self, total: int, offset: int):
@@ -103,13 +111,23 @@ class PaginationClient:
         self.total_count = 0
         self.current_count = self.calculate_current_count()
 
+    def calculate_total_pages():
+        """"""
+
     def calculate_current_count():
         """
         @TODO
         """
+        # current_count_min = 0
+        # current_count_max = 0
 
 
 class TDArtistListResult(TypedDict):
     pagination_init: PaginationInit
     name: Optional[str]
     service: Optional[str]
+
+
+class TDArtistResponse(TypedDict):
+    artists: List[Artist]
+    pagination_client: PaginationClient
