@@ -71,6 +71,24 @@ def count_artists(service: str = None) -> int:
     return artist_count
 
 
+def count_artists_by_name(name: str = None) -> int:
+    """"""
+    cursor = get_cursor()
+    arg_dict = dict(
+        name=name
+    )
+    query = f"""
+        SELECT COUNT(*) as artist_count
+        FROM lookup
+        WHERE
+            service != 'discord-channel'
+            {f"AND name = %(name)s" if name else ""}
+    """
+    cursor.execute(query, arg_dict)
+    artist_count: int = cursor.fetchone()['artist_count']
+    return artist_count
+
+
 def get_artists_by_name(pagination_init: PaginationInit, name: str = None, service: str = None, reload: bool = False) -> List[Artist]:
 
     redis = get_conn()
@@ -94,7 +112,7 @@ def get_artists_by_name(pagination_init: PaginationInit, name: str = None, servi
         return get_artists_by_name(pagination_init, service=service, reload=reload)
 
     cursor = get_cursor()
-    artist_count = count_artists(service)
+    artist_count = count_artists_by_name(name)
     pagination_db = PaginationDB(pagination_init, artist_count)
     arg_dict = dict(
         service=service,
