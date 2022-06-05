@@ -12,7 +12,7 @@ export async function searchArtistsPage(section) {
   const cardList = cardListElem.querySelector(".card-list__items");
 
   const artists = await kemonoAPI.api.artists();
-  const fragment = document.createDocumentFragment();
+  const artistCards = document.createDocumentFragment();
 
   for await (const artist of artists) {
     const card = UserCard(null, artist);
@@ -22,7 +22,7 @@ export async function searchArtistsPage(section) {
       card.classList.add("user-card--fav");
     }
 
-    fragment.appendChild(card);
+    artistCards.appendChild(card);
   }
 
   cardList.appendChild(artistCards);
