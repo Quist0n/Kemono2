@@ -4,11 +4,11 @@ import { isLoggedIn } from "@wp/js/account";
 import { findFavouriteArtist } from "@wp/js/favorites";
 
 /**
- * @type {KemonoAPI.User[]}
+ * @type {KemonoAPI.Artist[]}
  */
 let creators;
 /**
- * @type {KemonoAPI.User[]}
+ * @type {KemonoAPI.Artist[]}
  */
 let filteredCreators;
 let skip = 0;

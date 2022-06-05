@@ -6,12 +6,13 @@
 {% from 'components/cards/user.html' import user_card_skeleton %}
 
 {% block content %}
-  {% call site.section("search-artists", title="Search Artists") %}
+  {# djlint: off #}
+{% call site.section("search-artists", title="Search Artists") %}
   {% call card_list('table') %}
-
+  {% endcall %}
 {% endcall %}
-{% endcall %}
 
+  {# djlint: on #}
 {% endblock content %}
 
 {% block components %}

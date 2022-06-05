@@ -5,7 +5,8 @@ export const api = {
   bans,
   bannedArtist,
   creators,
-  logs
+  logs,
+  artists,
 };
 
 async function bans() {
@@ -36,7 +37,7 @@ async function bans() {
  */
 async function bannedArtist(id, service) {
   const params = new URLSearchParams([
-    ["service", service ],
+    ["service", service],
   ]).toString();
 
   try {
@@ -59,6 +60,37 @@ async function bannedArtist(id, service) {
   }
 }
 
+/**
+ * @typedef IArtist
+ * @property {string} id
+ * @property {string} indexed
+ * @property {string} name
+ * @property {string} service
+ * @property {string} updated
+ */
+
+/**
+ * @param {number} [page]
+ * @returns {IArtist[]}
+ */
+async function artists(page) {
+  try {
+    const url = page ? `/api/v1/artists/${page}` : "/api/v1/artists";
+    const response = await kemonoFetch(url, { method: "GET" });
+    if (!response || !response.ok) {
+
+      alert(new KemonoError(8));
+      return null;
+    }
+
+    const artists = await response.json();
+
+    return artists;
+  } catch (error) {
+
+  }
+}
+
 async function creators() {
   try {
     const response = await kemonoFetch('/api/creators', { method: "GET" });
@@ -70,7 +102,7 @@ async function creators() {
     }
 
     /**
-     * @type {KemonoAPI.User[]}
+     * @type {KemonoAPI.Artist[]}
      */
     const artists = await response.json();
 

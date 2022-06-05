@@ -6,6 +6,7 @@ import { importerPage } from "./importer_list";
 import { importerStatusPage } from "./importer_status";
 import { postsPage } from "./posts";
 import { artistsPage } from "./artists";
+import { searchArtistsPage } from "./search/artists.js";
 import { updatedPage } from "./updated";
 import { uploadPage } from "./upload";
 
@@ -25,4 +26,5 @@ export const globalPageScripts = new Map([
   ["artists", artistsPage],
   ["updated", updatedPage],
   ["upload", uploadPage],
+  ["search-artists", searchArtistsPage]
 ]);
