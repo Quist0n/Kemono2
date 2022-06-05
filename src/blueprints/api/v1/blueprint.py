@@ -7,7 +7,7 @@ from src.lib.favorites import get_favorite_artists, get_favorite_posts
 from src.utils.utils import get_value, parse_int
 
 from .lib import count_artists, get_artists
-from .types import DEFAULT_PAGE_LIMIT
+from .types import DEFAULT_PAGE_LIMIT, TDArtistResponse, TDPagination, TDAPIResponseSuccess
 
 v1api = Blueprint('v1', __name__, url_prefix='/v1')
 
@@ -52,6 +52,7 @@ def list_artists(page: str):
     artist_count = count_artists()
     total_pages = math.floor(artist_count / limit) + 1
     is_valid_page = current_page and current_page <= total_pages
+
     # current page is zero or greater than total pages
     if (not is_valid_page):
         redirect_url = url_for('.list_artists', page=total_pages, **request.args)
@@ -61,8 +62,21 @@ def list_artists(page: str):
     offset = (current_page - 1) * limit
     sql_limit = artist_count - offset if current_page == total_pages else limit
     artists = get_artists(current_page, offset, sql_limit)
-
-    response = make_response(jsonify(artists), 200)
+    pagination = TDPagination(
+        total_count=artist_count,
+        total_pages=total_pages,
+        current_page=current_page,
+        limit=limit
+    )
+    response_body = TDArtistResponse(
+        pagination=pagination,
+        artists=artists
+    )
+    api_response = TDAPIResponseSuccess(
+        is_successful=True,
+        data=response_body
+    )
+    response = make_response(jsonify(api_response), 200)
     response.headers['Cache-Control'] = 's-maxage=60'
 
     return response

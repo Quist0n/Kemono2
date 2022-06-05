@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Literal, Optional, TypedDict
 
@@ -24,7 +25,6 @@ class TDAPIRequest(TypedDict):
 class TDAPIResponseSuccess(TypedDict):
     """
     Base API response.
-
     """
     is_successful: Literal[True]
     data: Optional[Dict]
@@ -54,10 +54,13 @@ class ValidationResult(TypedDict):
     validation_errors: Optional[List[Dict]]
 
 
-class TDArtistListResult(TypedDict):
-    name: Optional[str]
-    service: Optional[str]
+class TDPagination(TypedDict):
+    total_count: int
+    total_pages: int
+    current_page: int
+    limit: int
 
 
 class TDArtistResponse(TypedDict):
+    pagination: TDPagination
     artists: List[TDArtist]
