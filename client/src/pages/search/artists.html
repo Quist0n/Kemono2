@@ -1,0 +1,18 @@
+{% extends 'components/shell.html' %}
+
+{% import 'components/site.html' as site %}
+{% from 'components/image_link.html' import image_link %}
+{% from 'components/card_list.html' import card_list %}
+{% from 'components/cards/user.html' import user_card_skeleton %}
+
+{% block content %}
+{% call site.section("search-artists", title="Search Artists") %}
+    {% call card_list('table') %}
+    {% endcall %}
+{% endcall %}
+{% endblock %}
+
+{% block components %}
+  {{ image_link("") }}
+  {{ user_card_skeleton() }}
+{% endblock components %}
