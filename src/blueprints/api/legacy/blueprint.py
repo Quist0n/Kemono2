@@ -7,3 +7,9 @@ legacy_api = Blueprint('legacy_api', __name__)
 def api_list():
     new_url = url_for('api.v1.list_account_favorites', **request.args)
     return redirect(new_url, 301)
+
+# @TODO: move the page template using this API
+# @legacy_api.route('/creators')
+# def creators():
+#     new_url = url_for('api.v1.list_artists', **request.args)
+#     return redirect(new_url, 301)

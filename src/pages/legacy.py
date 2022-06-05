@@ -26,6 +26,7 @@ from ..utils.utils import make_cache_key, relative_time, delta_key, allowed_file
 
 legacy = Blueprint('legacy', __name__)
 
+
 @legacy.route('/posts/upload')
 def upload_post():
     props = {
