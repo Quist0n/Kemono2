@@ -70,7 +70,7 @@ function handlePostView(link) {
 }
 
 /**
- * @param {HTMLElement} element
+ * @param {HTMLElement | null} element
  * @param {KemonoAPI.Artist} user
  * @param {boolean} isCount
  * @param {boolean} isDate

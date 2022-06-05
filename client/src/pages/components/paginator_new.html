@@ -24,7 +24,7 @@
             ...
           </span>
         {% endif %}
-        
+
       </li>
       <li class="paginator__page">
         {% if current_page > 2 %}
@@ -41,24 +41,24 @@
         {% endif %}
       </li>
 
-      <li 
+      <li
         class="paginator__page paginator__page--current"
         style="--local-width: {{ total_pages | string | length + 4 }}em;"
       >
         <input
           class="form__input paginator__input"
           form= "{{ id }}"
-          type="number" 
-          name="page" 
+          type="number"
+          name="page"
           value="{{ current_page }}"
           min="1"
           max="{{ total_pages }}"
           step="1"
         >
-        <button 
+        <button
           class="form__button form__button--submit paginator__submit"
           type="submit"
-          form="{{ id }}" 
+          form="{{ id }}"
         >
           Go!
         </button>
@@ -113,4 +113,28 @@
       <input type="hidden" name="{{ param }}" value="{{ pagination.base[param] }}">
     {% endfor %}
   </form>
+{% endmacro %}
+
+{# client-only paginator #}
+{% macro paginator_client_skeleton() %}
+  <div class="paginator-client" >
+    <p class="paginator-client__info" ></p>
+    <ul class="paginator-client__pages">
+      <li
+        class="paginator-client__page paginator-client__page--first"
+      >1</li>
+      <li
+        class="paginator-client__page paginator-client__page--previous"
+      ></li>
+      <li
+        class="paginator-client__page paginator-client__page--current"
+      ></li>
+      <li
+        class="paginator-client__page paginator-client__page--next"
+      ></li>
+      <li
+        class="paginator-client__page paginator-client__page--last"
+      ></li>
+    </ul>
+  </div>
 {% endmacro %}

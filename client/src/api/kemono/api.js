@@ -61,6 +61,14 @@ async function bannedArtist(id, service) {
 }
 
 /**
+ * @typedef IPagination
+ * @property {number} total_count
+ * @property {number} total_pages
+ * @property {number} current_page
+ * @property {number} limit
+ */
+
+/**
  * @typedef IArtist
  * @property {string} id
  * @property {string} indexed
@@ -70,8 +78,20 @@ async function bannedArtist(id, service) {
  */
 
 /**
+ * @typedef IArtistsAPIBody
+ * @property {IPagination} pagination
+ * @property {IArtist[]} artists
+ */
+
+/**
+ * @typedef IArtistsAPIResponse
+ * @property {boolean} is_successful
+ * @property {IArtistsAPIBody} data
+ */
+
+/**
  * @param {number} [page]
- * @returns {IArtist[]}
+ * @returns {IArtistsAPIResponse}
  */
 async function artists(page) {
   try {
@@ -83,9 +103,9 @@ async function artists(page) {
       return null;
     }
 
-    const artists = await response.json();
+    const apiResponse = await response.json();
 
-    return artists;
+    return apiResponse;
   } catch (error) {
 
   }

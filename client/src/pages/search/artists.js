@@ -1,8 +1,6 @@
 import { kemonoAPI } from "@wp/api";
-import { UserCard } from "@wp/components";
+import { PaginatorClient, UserCard } from "@wp/components";
 import { findFavouriteArtist } from "@wp/js/favorites";
-
-const pageLimit = 25;
 
 /**
  * @param {HTMLElement} section
@@ -10,8 +8,12 @@ const pageLimit = 25;
 export async function searchArtistsPage(section) {
   const cardListElem = section.querySelector(".card-list");
   const cardList = cardListElem.querySelector(".card-list__items");
-
-  const artists = await kemonoAPI.api.artists();
+  /**
+   * @type {import("api/kemono/api.js").IArtistsAPIResponse}
+   */
+  const { data: { artists, pagination } } = await kemonoAPI.api.artists();
+  const paginatorTop = PaginatorClient({ pagination });
+  const paginatorBottom = PaginatorClient({ pagination });
   const artistCards = document.createDocumentFragment();
 
   for await (const artist of artists) {
@@ -26,5 +28,6 @@ export async function searchArtistsPage(section) {
   }
 
   cardList.appendChild(artistCards);
-
+  cardList.insertAdjacentElement("beforebegin", paginatorTop)
+  cardList.insertAdjacentElement("afterend", paginatorBottom)
 }
