@@ -1,0 +1,14 @@
+{% from 'components/meta/attributes.html' import attributes %}
+{% from 'components/forms/base.html' import form_section, label, input %}
+
+{% macro input_number(id, name, title) %}
+  {# djlint: off #}
+  {% call form_section(**kwargs) %}
+    {% call label(for=id) %}
+      {{ title }}
+    {% endcall %}
+    {{ input(id=id, name=name, type="number") }}
+  {% endcall %}
+
+  {# djlint: on #}
+{% endmacro %}

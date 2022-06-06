@@ -60,7 +60,9 @@ export function PaginatorClient({ pagination, onPageChange }) {
     prev.textContent = "...";
   }
 
-  current.textContent = String(current_page);
+  current.appendChild(
+    SelectedPage({ pagination, onPageChange })
+  );
 
   if (current_page + 1 < total_pages) {
     const button = Button({
@@ -108,6 +110,62 @@ export function PaginatorClient({ pagination, onPageChange }) {
 
     onPageChange(newPage);
   }
+
+  return component;
+}
+
+/**
+ * @typedef {IPaginatorClientProps}ISelectedPageProps
+ *
+ */
+
+/**
+ * @param {ISelectedPageProps} props
+ */
+function SelectedPage({ pagination, onPageChange }) {
+  const { current_page, total_pages } = pagination;
+  /**
+   * @type {HTMLFormElement}
+   */
+  const component = createComponent("paginator-client__selected-page");
+  /**
+   * @type {[HTMLInputElement, HTMLButtonElement, HTMLButtonElement]}
+   */
+  const [selected, subtract, increase] = Array.from(component.children).map(
+    (section) => section.firstElementChild
+  );
+
+  selected.min = "1";
+  selected.max = String(total_pages);
+  selected.step = "1";
+  selected.value = String(current_page);
+
+  subtract.onclick = () => {
+    selected.stepDown();
+  };
+
+  increase.onclick = () => {
+    selected.stepUp();
+  };
+
+  component.onsubmit = (event) => {
+    event.preventDefault();
+    /**
+     * @type {HTMLFormElement}
+     */
+    const form = event.target;
+    /**
+     * @type {HTMLInputElement}
+     */
+    const input = form.elements["selected_page"];
+    const selectedPage = Number(input.value);
+
+    if (selectedPage === pagination.current_page) {
+      return;
+    }
+
+    onPageChange(selectedPage);
+  };
 
   return component;
 }

@@ -1,8 +1,22 @@
+{% from 'components/meta/attributes.html' import attributes %}
+
 {% macro form() %}
-  <form
-    class="form {{ kwargs.pop('class') if kwargs.class }}"
-    {% for attribute in kwargs %}
-      {{ attribute }}="{{kwargs[attribute]}}"
-    {% endfor %}
-  >{{ caller() if caller }}</form>
+  <form {{ attributes('form', **kwargs) }}>{{ caller() if caller }}
+  </form>
+{% endmacro %}
+
+{# call-only macro #}
+{% macro form_section() %}
+  <div {{ attributes('form__section', **kwargs) }}>{{ caller()}}
+  </div>
+{% endmacro %}
+
+{% macro label(for) %}
+  <label for="{{ for }}" {{ attributes('form__label', **kwargs) }}>
+    {{ caller()}}
+  </label>
+{% endmacro %}
+
+{% macro input(id, name) %}
+  <input id="{{ id }}" name="{{ name }}" {{ attributes('form__input', **kwargs) }}>
 {% endmacro %}
