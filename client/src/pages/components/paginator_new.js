@@ -1,10 +1,10 @@
 import { createComponent } from "@wp/js/component-factory.js";
-import { Button } from "./buttons.js";
+import { Button } from "@wp/components";
 
 /**
  * @typedef IPaginatorClientProps
  * @property { import("api/kemono/api.js").IPagination } pagination
- * @property {(page: number) => Promise<number>} onPageChange
+ * @property {(page: number) => void} onPageChange
  */
 
 /**
@@ -43,12 +43,18 @@ export function PaginatorClient({ pagination, onPageChange }) {
   if (isFirstPage) {
     first.textContent = String(1);
   } else {
-    const button = Button({ textContent: String(1) });
+    const button = Button({
+      textContent: String(1),
+      value: String(1)
+    });
     first.appendChild(button);
   }
 
   if (current_page - 1 > 1) {
-    const button = Button({ textContent: String(current_page - 1) });
+    const button = Button({
+      textContent: String(current_page - 1),
+      value: String(current_page - 1)
+    });
     prev.appendChild(button);
   } else {
     prev.textContent = "...";
@@ -57,7 +63,10 @@ export function PaginatorClient({ pagination, onPageChange }) {
   current.textContent = String(current_page);
 
   if (current_page + 1 < total_pages) {
-    const button = Button({ textContent: String(current_page + 1) });
+    const button = Button({
+      textContent: String(current_page + 1),
+      value: String(current_page + 1)
+    });
     next.appendChild(button);
   } else {
     next.textContent = "...";
@@ -66,8 +75,38 @@ export function PaginatorClient({ pagination, onPageChange }) {
   if (isLastPage) {
     last.textContent = String(total_pages);
   } else {
-    const button = Button({ textContent: String(total_pages) });
+    const button = Button({
+      textContent: String(total_pages),
+      value: String(total_pages)
+    });
     last.appendChild(button);
+  }
+
+  // doing it this way to avoid memory leaks
+  component.onclick = handlePageChange;
+
+  /**
+   * @param {MouseEvent} event
+   */
+  function handlePageChange(event) {
+    event.stopPropagation();
+    /**
+     * @type {HTMLButtonElement}
+     */
+    const button = event.target;
+    const isButton = button.tagName === "BUTTON" && button.classList.contains("button");
+
+    if (!isButton) {
+      return;
+    }
+
+    const newPage = Number(button.value);
+
+    if (newPage === current_page) {
+      return;
+    }
+
+    onPageChange(newPage);
   }
 
   return component;

@@ -1,11 +1,11 @@
 import { createComponent } from "@wp/js/component-factory.js";
 
 /**
- * @typedef IButtonProps
+ * @typedef {Partial<HTMLButtonElement>} IButtonProps
  */
 
 /**
- * @param {Partial<HTMLButtonElement> & IButtonProps} props
+ * @param {IButtonProps} props
  */
 export function Button({ ...buttonProps }) {
   /**

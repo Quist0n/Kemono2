@@ -5,6 +5,7 @@
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/user.html' import user_card_skeleton %}
 {% from 'components/paginator_new.html' import paginator_client_skeleton %}
+{% from 'components/buttons.html' import button %}
 
 {% block content %}
   {# djlint: off #}
@@ -17,6 +18,7 @@
 {% endblock content %}
 
 {% block components %}
+  {{ button() }}
   {{ paginator_client_skeleton() }}
   {{ image_link("") }}
   {{ user_card_skeleton() }}
