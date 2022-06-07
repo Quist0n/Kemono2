@@ -66,7 +66,7 @@ def get_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return get_artists(reload=reload)
+        return get_artists(current_page, offset, limit, reload=reload)
 
     cursor = get_cursor()
     arg_dict = dict(
