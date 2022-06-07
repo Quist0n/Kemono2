@@ -94,7 +94,7 @@ def list_artists(page: str):
         offset=offset,
         sql_limit=sql_limit
     )
-    artists = get_artists(pagination_db, search_params["service"])
+    artists = get_artists(pagination_db, search_params.get("service"))
     pagination = TDPagination(
         total_count=artist_count,
         total_pages=total_pages,

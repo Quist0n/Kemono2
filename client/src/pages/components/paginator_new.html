@@ -1,7 +1,7 @@
 {% from 'components/links.html' import link_button %}
 {% from 'components/forms/base.html' import form, form_section %}
 {% from 'components/forms/inputs.html' import input_number %}
-{% from 'components/forms/submit_button.html' import submit_button %}
+{% from 'components/forms/base.html' import submit_button %}
 {% from 'components/buttons.html' import button %}
 
 {# `id` is the id of related `form_controller()` #}
@@ -144,7 +144,11 @@
 {% endmacro %}
 
 {% macro selected_page() %}
-  {% call form(class="paginator-client__selected-page") %}
+  {% call form(
+    submit_text="Go",
+    submit_class="paginator-client__submit",
+    class="paginator-client__selected-page"
+  ) %}
     {{ input_number(
       id="paginator-client-current-page",
       class="paginator-client__selected-input",
@@ -160,11 +164,6 @@
       class="paginator-client__increase"
     ) %}
       {{ button("+1") }}
-    {% endcall %}
-    {% call form_section(
-      class="paginator-client__submit"
-    ) %}
-      {{ submit_button("Go") }}
     {% endcall %}
   {% endcall %}
 {% endmacro %}

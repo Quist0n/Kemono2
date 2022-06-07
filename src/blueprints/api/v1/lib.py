@@ -74,8 +74,8 @@ def get_artists(
     """
     redis = get_conn()
     redis_key = construct_artists_key(
-        *("service", service) if service else None,
-        str(pagination_db['current_page'])
+        *("service", service) if service else "",
+        str(pagination_db["pagination_init"]["current_page"])
     )
 
     artists = redis.get(redis_key)

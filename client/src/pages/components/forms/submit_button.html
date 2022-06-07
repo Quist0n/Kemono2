@@ -1,6 +1,0 @@
-{% from 'components/meta/attributes.html' import attributes %}
-
-{%- macro submit_button(text) -%}
-  <button type="submit" {{ attributes('button form__button form__button--submit', **kwargs) }}>{{ text if not caller else caller() }}
-  </button>
-{%- endmacro -%}

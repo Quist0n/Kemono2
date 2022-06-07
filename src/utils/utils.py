@@ -1,11 +1,25 @@
-from urllib.parse import urlencode, parse_qs, urlsplit, urlunsplit
-from datetime import datetime
-from flask import request, g
+import hashlib
 import json
 import random
-import hashlib
+from dataclasses import fields
+from datetime import datetime
+from typing import Optional, TypedDict
+from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
+
+from flask import g, request
+
 from configs.derived_vars import is_development
 from src.types.paysites import Paysites
+
+
+class TDOption(TypedDict):
+    """
+    `<option>` attributes plus `title` for macro.
+    """
+    value: str
+    title: Optional[str]
+    selected: Optional[str]
+
 
 freesites = {
     "kemono": {
@@ -32,6 +46,16 @@ paysite_list = [
 ]
 
 paysites = Paysites()
+# pre-configured `options`
+# because Jinja cannot into list comprehensions
+paysite_options = [
+    TDOption(
+        value=field.name,
+        title=paysites[field.name].title
+    )
+    for field
+    in fields(paysites)
+]
 
 
 def set_query_parameter(url, param_name, param_value):

@@ -1,6 +1,8 @@
 {% extends "components/shell.html" %}
 
 {% import 'components/site.html' as site %}
+{% from 'components/forms/base.html' import form %}
+{% from 'components/forms/inputs.html' import input_text, input_select %}
 {% from 'components/image_link.html' import image_link %}
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/user.html' import user_card_skeleton %}
@@ -10,6 +12,22 @@
 {% block content %}
   {# djlint: off #}
 {% call site.section("search-artists", title="Search Artists") %}
+  {% call form(submit_text="Seach", id="artist-search") %}
+    {% set options = [
+      dict(
+        value="",
+        selected="true",
+        title="All"
+      )
+    ] + g.paysite_options %}
+    {{ input_select(
+      id="search-artists-service",
+      name="service",
+      title="Paysite",
+      options=options
+    ) }}
+  {% endcall %}
+
   {% call card_list('table') %}
   {% endcall %}
 {% endcall %}
