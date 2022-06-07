@@ -1,3 +1,4 @@
+from typing import Tuple
 from flask import current_app
 from os import getenv
 import dateutil
@@ -59,8 +60,10 @@ def init():
 def get_conn():
     return cluster.get_routing_client()
 
+
 def scan_keys(pattern):
     return cluster.get_local_client_for_key(pattern).scan_iter(match=pattern, count=5000)
+
 
 def serialize_dict(data):
     to_serialize = {
@@ -98,3 +101,10 @@ def deserialize_dict_list(data):
     data = ujson.loads(data)
     to_return = list(map(lambda elem: deserialize_dict(elem), data))
     return to_return
+
+
+def key_constructor(namespace: str):
+    def construct_key(*keys: Tuple[str]):
+        return ":".join((namespace, *keys))
+
+    return construct_key

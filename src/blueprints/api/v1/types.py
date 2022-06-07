@@ -35,14 +35,12 @@ class TDAPIResponseFaillure(TypedDict):
     `validation_errors` is a separate entity for use by forms.
     """
     is_successful: Literal[False]
-    errors: Optional[List[str]]
-    validation_errors: Optional[List[Dict]]
+    errors: List[str]
 
 
 class TDArtistListParams(TypedDict):
-    page: int
-    service: str
-    name: str
+    service: Optional[str]
+    # name: str
 
 
 class ValidationResult(TypedDict):
@@ -52,6 +50,12 @@ class ValidationResult(TypedDict):
     is_successful: bool
     data: Optional[Dict]
     validation_errors: Optional[List[Dict]]
+
+
+class TDPaginationDB(TypedDict):
+    current_page: int
+    offset: int
+    sql_limit: int
 
 
 class TDPagination(TypedDict):

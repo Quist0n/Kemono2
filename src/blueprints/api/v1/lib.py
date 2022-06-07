@@ -1,16 +1,20 @@
 import time
 from typing import List
+from flask import Request
 
 from src.internals.cache.redis import (
     KemonoRedisLock,
     deserialize_dict_list,
     get_conn,
-    serialize_dict_list
+    serialize_dict_list,
+    key_constructor
 )
 from src.internals.database.database import get_cursor
 from src.utils.utils import paysite_list
 
-from .types import TDArtist
+from .types import TDArtist, TDPaginationDB, TDArtistListParams
+
+construct_artists_key = key_constructor("artists")
 
 
 def count_artists(reload: bool = False) -> int:
@@ -45,10 +49,19 @@ def count_artists(reload: bool = False) -> int:
     return artist_count
 
 
+def validate_artists_request(req: Request):
+    errors = []
+    args_dict: TDArtistListParams = req.args.to_dict()
+    service = args_dict.get("service", "").strip()
+
+    if (service and service not in paysite_list):
+        errors.append("Not a valid service")
+
+    return errors
+
+
 def get_artists(
-    current_page: int,
-    offset: int,
-    limit: int,
+    pagination_db: TDPaginationDB,
     reload: bool = False
 ) -> List[TDArtist]:
     """
@@ -56,7 +69,7 @@ def get_artists(
     @TODO return dataclass
     """
     redis = get_conn()
-    redis_key = f"artists:{str(current_page)}"
+    redis_key = f"artists:{str(pagination_db['current_page'])}"
 
     artists = redis.get(redis_key)
 
@@ -67,12 +80,12 @@ def get_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return get_artists(current_page, offset, limit, reload=reload)
+        return get_artists(pagination_db, reload=reload)
 
     cursor = get_cursor()
     arg_dict = dict(
-        offset=offset,
-        limit=limit
+        offset=pagination_db["offset"],
+        limit=pagination_db["sql_limit"]
     )
     query = """
         SELECT id, indexed, name, service, updated
@@ -81,7 +94,8 @@ def get_artists(
             service != 'discord-channel'
         ORDER BY
             indexed ASC,
-            name ASC
+            name ASC,
+            service ASC
         OFFSET %(offset)s
         LIMIT %(limit)s
     """

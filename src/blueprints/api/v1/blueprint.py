@@ -6,8 +6,15 @@ from src.lib.account import load_account
 from src.lib.favorites import get_favorite_artists, get_favorite_posts
 from src.utils.utils import get_value, parse_int
 
-from .lib import count_artists, get_artists
-from .types import DEFAULT_PAGE_LIMIT, TDArtistResponse, TDPagination, TDAPIResponseSuccess
+from .lib import count_artists, get_artists, validate_artists_request
+from .types import (
+    DEFAULT_PAGE_LIMIT,
+    TDAPIResponseSuccess,
+    TDArtistResponse,
+    TDPagination,
+    TDPaginationDB,
+    TDAPIResponseFaillure
+)
 
 v1api = Blueprint('v1', __name__, url_prefix='/v1')
 
@@ -47,6 +54,16 @@ def get_artists_last():
 
 @v1api.get("/artists/<page>")
 def list_artists(page: str):
+    errors = validate_artists_request(request)
+
+    if errors:
+        api_response = TDAPIResponseFaillure(
+            is_successful=False,
+            errors=errors
+        )
+        response = make_response(jsonify(api_response), 422)
+        return response
+
     current_page = parse_int(page)
     limit = DEFAULT_PAGE_LIMIT
     artist_count = count_artists()
@@ -61,7 +78,12 @@ def list_artists(page: str):
 
     offset = (current_page - 1) * limit
     sql_limit = artist_count - offset if current_page == total_pages else limit
-    artists = get_artists(current_page, offset, sql_limit)
+    pagination_db = TDPaginationDB(
+        current_page=current_page,
+        offset=offset,
+        sql_limit=sql_limit
+    )
+    artists = get_artists(pagination_db)
     pagination = TDPagination(
         total_count=artist_count,
         total_pages=total_pages,
