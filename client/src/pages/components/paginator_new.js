@@ -127,14 +127,22 @@ function SelectedPage({ pagination, onPageChange }) {
   /**
    * @type {HTMLFormElement}
    */
-  const component = createComponent("paginator-client__selected-page");
+  const component = createComponent("form paginator-client__selected-page");
   /**
-   * @type {[HTMLInputElement, HTMLButtonElement, HTMLButtonElement]}
+   * @type {[HTMLLabelElement, HTMLButtonElement, HTMLButtonElement]}
    */
-  const [selected, subtract, increase] = Array.from(component.children).map(
+  const [label, subtract, increase] = Array.from(component.children).map(
     (section) => section.firstElementChild
   );
+  /**
+   * @type {HTMLInputElement}
+   */
+  const selected = label.nextElementSibling;
+  const maxNumberLength = String(total_pages).length;
 
+  // ensure the width doesn't change between page switches
+  // but also can fit the max possible value
+  component.style.setProperty("--local-width", `${maxNumberLength + 2}em`);
   selected.min = "1";
   selected.max = String(total_pages);
   selected.step = "1";
@@ -146,6 +154,10 @@ function SelectedPage({ pagination, onPageChange }) {
 
   increase.onclick = () => {
     selected.stepUp();
+  };
+
+  component.onclick = (event) => {
+    event.stopPropagation();
   };
 
   component.onsubmit = (event) => {

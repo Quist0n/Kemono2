@@ -1,22 +1,22 @@
 {% from 'components/meta/attributes.html' import attributes %}
 
-{% macro form() %}
+{% macro form() -%}
   <form {{ attributes('form', **kwargs) }}>{{ caller() if caller }}
   </form>
-{% endmacro %}
+{%- endmacro %}
 
 {# call-only macro #}
-{% macro form_section() %}
+{% macro form_section() -%}
   <div {{ attributes('form__section', **kwargs) }}>{{ caller()}}
   </div>
-{% endmacro %}
+{%- endmacro %}
 
-{% macro label(for) %}
+{% macro label(for) -%}
   <label for="{{ for }}" {{ attributes('form__label', **kwargs) }}>
     {{ caller()}}
   </label>
-{% endmacro %}
+{%- endmacro %}
 
-{% macro input(id, name) %}
+{% macro input(id, name) -%}
   <input id="{{ id }}" name="{{ name }}" {{ attributes('form__input', **kwargs) }}>
-{% endmacro %}
+{%- endmacro %}

@@ -4,7 +4,7 @@
 {% from 'components/image_link.html' import image_link %}
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/user.html' import user_card_skeleton %}
-{% from 'components/paginator_new.html' import paginator_client_skeleton, current_page %}
+{% from 'components/paginator_new.html' import paginator_client_skeleton, selected_page %}
 {% from 'components/buttons.html' import button %}
 
 {% block content %}
@@ -18,7 +18,7 @@
 {% endblock content %}
 
 {% block components %}
-  {{ current_page() }}
+  {{ selected_page() }}
   {{ button() }}
   {{ paginator_client_skeleton() }}
   {{ image_link("") }}

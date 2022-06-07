@@ -146,7 +146,9 @@
 {% macro selected_page() %}
   {% call form(class="paginator-client__selected-page") %}
     {{ input_number(
-      id="paginator-client-current-page", name="selected_page"
+      id="paginator-client-current-page",
+      class="paginator-client__selected-input",
+      name="selected_page",
       title="Selected page"
     ) }}
     {% call form_section(
