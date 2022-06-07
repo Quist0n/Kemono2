@@ -18,3 +18,6 @@ class Paysites:
     gumroad = Gumroad()
     patreon = Patreon()
     subscribestar = Subscribestar()
+
+    def __getitem__(self, key):
+        return getattr(self, key)

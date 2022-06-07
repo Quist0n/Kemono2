@@ -8,6 +8,7 @@ from src.internals.cache.redis import (
     serialize_dict_list
 )
 from src.internals.database.database import get_cursor
+from src.utils.utils import paysite_list
 
 from .types import TDArtist
 
@@ -78,6 +79,9 @@ def get_artists(
         FROM lookup
         WHERE
             service != 'discord-channel'
+        ORDER BY
+            indexed ASC,
+            name ASC
         OFFSET %(offset)s
         LIMIT %(limit)s
     """
