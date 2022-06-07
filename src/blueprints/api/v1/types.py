@@ -38,7 +38,7 @@ class TDAPIResponseFaillure(TypedDict):
     errors: List[str]
 
 
-class TDArtistListParams(TypedDict):
+class TDArtistsParams(TypedDict):
     service: Optional[str]
     # name: str
 
@@ -52,8 +52,15 @@ class ValidationResult(TypedDict):
     validation_errors: Optional[List[Dict]]
 
 
-class TDPaginationDB(TypedDict):
+class TDPaginationInit(TypedDict):
     current_page: int
+    limit: int
+    total_count: int
+    total_pages: int
+
+
+class TDPaginationDB(TypedDict):
+    pagination_init: TDPaginationInit
     offset: int
     sql_limit: int
 

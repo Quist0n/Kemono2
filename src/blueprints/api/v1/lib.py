@@ -1,20 +1,23 @@
 import time
 from typing import List
+
 from flask import Request
 
 from src.internals.cache.redis import (
     KemonoRedisLock,
+    create_counts_key_constructor,
+    create_key_constructor,
     deserialize_dict_list,
     get_conn,
-    serialize_dict_list,
-    key_constructor
+    serialize_dict_list
 )
 from src.internals.database.database import get_cursor
 from src.utils.utils import paysite_list
 
-from .types import TDArtist, TDPaginationDB, TDArtistListParams
+from .types import TDArtist, TDArtistsParams, TDPaginationDB
 
-construct_artists_key = key_constructor("artists")
+construct_artists_key = create_key_constructor("artists")
+construct_artists_count_key = create_counts_key_constructor("artists")
 
 
 def count_artists(reload: bool = False) -> int:
@@ -51,7 +54,7 @@ def count_artists(reload: bool = False) -> int:
 
 def validate_artists_request(req: Request):
     errors = []
-    args_dict: TDArtistListParams = req.args.to_dict()
+    args_dict: TDArtistsParams = req.args.to_dict()
     service = args_dict.get("service", "").strip()
 
     if (service and service not in paysite_list):
@@ -62,6 +65,7 @@ def validate_artists_request(req: Request):
 
 def get_artists(
     pagination_db: TDPaginationDB,
+    service: str = None,
     reload: bool = False
 ) -> List[TDArtist]:
     """
@@ -69,7 +73,10 @@ def get_artists(
     @TODO return dataclass
     """
     redis = get_conn()
-    redis_key = f"artists:{str(pagination_db['current_page'])}"
+    redis_key = construct_artists_key(
+        *("service", service) if service else None,
+        str(pagination_db['current_page'])
+    )
 
     artists = redis.get(redis_key)
 
@@ -80,18 +87,20 @@ def get_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return get_artists(pagination_db, reload=reload)
+        return get_artists(pagination_db, service, reload=reload)
 
     cursor = get_cursor()
     arg_dict = dict(
         offset=pagination_db["offset"],
-        limit=pagination_db["sql_limit"]
+        limit=pagination_db["sql_limit"],
+        service=service
     )
-    query = """
+    query = f"""
         SELECT id, indexed, name, service, updated
         FROM lookup
         WHERE
             service != 'discord-channel'
+            {"AND service = %(service)" if service else ""}
         ORDER BY
             indexed ASC,
             name ASC,

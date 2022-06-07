@@ -13,7 +13,9 @@ from .types import (
     TDArtistResponse,
     TDPagination,
     TDPaginationDB,
-    TDAPIResponseFaillure
+    TDAPIResponseFaillure,
+    TDPaginationInit,
+    TDArtistsParams
 )
 
 v1api = Blueprint('v1', __name__, url_prefix='/v1')
@@ -76,14 +78,23 @@ def list_artists(page: str):
 
         return redirect(redirect_url)
 
-    offset = (current_page - 1) * limit
-    sql_limit = artist_count - offset if current_page == total_pages else limit
-    pagination_db = TDPaginationDB(
+    search_params: TDArtistsParams = request.args.to_dict()
+    is_last_page = current_page == total_pages
+    pagination_init = TDPaginationInit(
         current_page=current_page,
+        limit=limit,
+        total_count=artist_count,
+        total_pages=total_pages
+    )
+
+    offset = (current_page - 1) * limit
+    sql_limit = artist_count - offset if is_last_page else limit
+    pagination_db = TDPaginationDB(
+        pagination_init=pagination_init,
         offset=offset,
         sql_limit=sql_limit
     )
-    artists = get_artists(pagination_db)
+    artists = get_artists(pagination_db, search_params["service"])
     pagination = TDPagination(
         total_count=artist_count,
         total_pages=total_pages,
