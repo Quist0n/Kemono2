@@ -20,12 +20,20 @@
         title="All"
       )
     ] + g.paysite_options %}
+
+    {{ input_text(
+      id="search-artist-name",
+      name="name",
+      title="Name"
+    ) }}
+
     {{ input_select(
       id="search-artists-service",
       name="service",
       title="Paysite",
       options=options
     ) }}
+
   {% endcall %}
 
   {% call card_list('table') %}

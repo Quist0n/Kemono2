@@ -91,11 +91,25 @@ async function bannedArtist(id, service) {
 
 /**
  * @param {number} [page]
- * @returns {IArtistsAPIResponse}
+ * @param {string} [service]
+ * @returns {Promise<IArtistsAPIResponse>}
  */
-async function artists(page) {
+async function artists(page, service) {
+  const path = page
+    ? `/api/v1/artists/${page}`
+    : "/api/v1/artists";
+
+  const searchParams = new URLSearchParams();
+
+  if (service) {
+    searchParams.set("service", service);
+  }
+
+  const url = Array.from(searchParams.keys()).length
+    ? `${path}?${searchParams.toString()}`
+    : path;
+
   try {
-    const url = page ? `/api/v1/artists/${page}` : "/api/v1/artists";
     const response = await kemonoFetch(url, { method: "GET" });
     if (!response || !response.ok) {
 
