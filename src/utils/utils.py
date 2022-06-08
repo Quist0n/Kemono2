@@ -1,6 +1,7 @@
 import hashlib
 import json
 import random
+from base64 import b64encode
 from dataclasses import fields
 from datetime import datetime
 from typing import Optional, TypedDict
@@ -184,6 +185,10 @@ def render_page_data():
 def get_import_id(data):
     salt = str(random.randrange(0, 1000))
     return take(16, hashlib.sha256((data + salt).encode('utf-8')).hexdigest())
+
+
+def encode_text_query(query: str):
+    return b64encode(query.encode('utf-8')).decode('utf-8') if query else ""
 
 
 # doing it in the end to avoid circular import error

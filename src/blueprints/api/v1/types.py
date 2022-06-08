@@ -1,7 +1,6 @@
-from dataclasses import dataclass
+from ctypes import Union
 from datetime import datetime
-from typing import Dict, List, Literal, Optional, TypedDict
-
+from typing import Dict, List, Literal, Optional, TypedDict, Type
 
 DEFAULT_PAGE_LIMIT = 25
 
@@ -40,16 +39,20 @@ class TDAPIResponseFaillure(TypedDict):
 
 class TDArtistsParams(TypedDict):
     service: Optional[str]
-    # name: str
+    name: Optional[str]
 
 
-class ValidationResult(TypedDict):
+class TDValidationFailure(TypedDict):
+    is_successful: Literal[False]
+    errors: List[str]
+
+
+class TDValidationSuccess(TypedDict):
     """
     TODO: Rewrite as a class with a generic.
     """
-    is_successful: bool
+    is_successful: Literal[True]
     data: Optional[Dict]
-    validation_errors: Optional[List[Dict]]
 
 
 class TDPaginationInit(TypedDict):

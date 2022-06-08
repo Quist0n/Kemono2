@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Union
 
 from flask import Request
 
@@ -12,29 +12,59 @@ from src.internals.cache.redis import (
     serialize_dict_list
 )
 from src.internals.database.database import get_cursor
-from src.utils.utils import paysite_list
+from src.utils.utils import paysite_list, encode_text_query
 
-from .types import TDArtist, TDArtistsParams, TDPaginationDB
+from .types import (
+    TDArtist,
+    TDArtistsParams,
+    TDPaginationDB,
+    TDValidationFailure,
+    TDValidationSuccess
+)
 
 construct_artists_key = create_key_constructor("artists")
 construct_artists_count_key = create_counts_key_constructor("artists")
 
 
-def validate_artists_request(req: Request):
+def validate_artists_request(req: Request) -> Union[TDValidationFailure, TDValidationSuccess]:
     errors = []
     args_dict: TDArtistsParams = req.args.to_dict()
     service = args_dict.get("service", "").strip()
+    name = args_dict.get("name", "").strip()
 
     if (service and service not in paysite_list):
         errors.append("Not a valid service")
 
-    return errors
+    if (errors):
+        result = TDValidationFailure(
+            is_successful=False,
+            errors=errors
+        )
+
+        return result
+
+    validated_params = TDArtistsParams(
+        service=service,
+        name=name
+    )
+    result = TDValidationSuccess(
+        is_successful=True,
+        data=validated_params
+    )
+
+    return result
 
 
-def count_artists(service: str = None, reload: bool = False) -> int:
+def count_artists(
+    service: str = None,
+    name: str = None,
+    reload: bool = False
+) -> int:
     redis = get_conn()
+    encoded_name = encode_text_query(name)
     redis_key = construct_artists_count_key(
-        *("service", service) if service else ""
+        *("service", service) if service else "",
+        *("name", encoded_name) if name else ""
     )
     artist_count = redis.get(redis_key)
     result = None
@@ -47,18 +77,21 @@ def count_artists(service: str = None, reload: bool = False) -> int:
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return count_artists(reload=reload)
+        return count_artists(service, name, reload=reload)
 
     cursor = get_cursor()
     query_args = dict(
-        service=service
+        service=service,
+        name=name
     )
+
     query = f"""
         SELECT COUNT(*) as artist_count
         FROM lookup
         WHERE
             service != 'discord-channel'
             {"AND service = %(service)s" if service else ""}
+            {"AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)" if name else ""}
     """
     cursor.execute(query, query_args)
     result = cursor.fetchone()
@@ -72,6 +105,7 @@ def count_artists(service: str = None, reload: bool = False) -> int:
 def get_artists(
     pagination_db: TDPaginationDB,
     service: str = None,
+    name: str = None,
     reload: bool = False
 ) -> List[TDArtist]:
     """
@@ -79,8 +113,10 @@ def get_artists(
     @TODO return dataclass
     """
     redis = get_conn()
+    encoded_name = encode_text_query(name)
     redis_key = construct_artists_key(
         *("service", service) if service else "",
+        *("name", encoded_name) if name else "",
         str(pagination_db["pagination_init"]["current_page"])
     )
 
@@ -93,20 +129,29 @@ def get_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return get_artists(pagination_db, service, reload=reload)
+        return get_artists(pagination_db, service, name, reload=reload)
 
     cursor = get_cursor()
     arg_dict = dict(
         offset=pagination_db["offset"],
         limit=pagination_db["sql_limit"],
-        service=service
+        service=service,
+        name=name
     )
     query = f"""
         SELECT id, indexed, name, service, updated
         FROM lookup
         WHERE
             service != 'discord-channel'
-            {"AND service = %(service)s" if service else ""}
+            {
+                "AND service = %(service)s"
+                if service
+                else ""}
+            {
+                "AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)"
+                if name
+                else ""
+            }
         ORDER BY
             indexed ASC,
             name ASC,
@@ -121,82 +166,3 @@ def get_artists(
     lock.release()
 
     return artists
-
-
-# def get_artists_by_name(pagination_init: PaginationInit, name: str = None, service: str = None, reload: bool = False) -> List[Artist]:
-
-#     redis = get_conn()
-
-#     if name and service:
-#         key = f"artists_by_service_and_name:{service}:{name}"
-#     elif name and not service:
-#         key = f"artists_by_name:{name}"
-#     else:
-#         return get_artists(pagination_init, service=service, reload=reload)
-
-#     artists = redis.get(key)
-
-#     if artists and not reload:
-#         return deserialize_dict_list(artists)
-
-#     lock = KemonoRedisLock(redis, key, expire=60, auto_renewal=True)
-
-#     if not lock.acquire(blocking=False):
-#         time.sleep(0.1)
-#         return get_artists_by_name(pagination_init, service=service, reload=reload)
-
-#     cursor = get_cursor()
-#     artist_count = count_artists(service)
-#     pagination_db = PaginationDB(pagination_init, artist_count)
-#     arg_dict = dict(
-#         service=service,
-#         name=name,
-#         **pagination_db.get_info()
-#     )
-
-#     query = f"""
-#         SELECT id, indexed, name, service, updated
-#         FROM lookup
-#         WHERE
-#             service != 'discord-channel'
-#             {f"AND service = %(service)s" if service else ""}
-#             {f"AND name = %(name)s" if name else ""}
-#         OFFSET %(offset)s
-#         LIMIT %(limit)s
-#     """
-
-#     cursor.execute(query, arg_dict)
-#     artists: List[Artist] = cursor.fetchall()
-#     redis.set(key, serialize_dict_list(artists), ex=600)
-#     return artists
-
-
-# def validate_artists_request(requestArg: Request):
-#     """
-#     Validate parameters for artist search from request.
-#     """
-#     search_params: TDArtistListParams = requestArg.args.to_dict()
-#     service = str(search_params["service"]).strip() if search_params.get("service") else None
-#     page = int(search_params.get("page")) if search_params.get("page") else None
-#     artist_name = str(search_params["name"]).strip() if search_params.get("name") else None
-#     errors = []
-
-#     if service and service not in paysite_list:
-#         errors.append(dict(message=f"Invalid service parameter. Service must be one of {paysite_list}"))
-
-#     if errors:
-#         return ValidationResult(
-#             is_successful=False,
-#             validation_errors=errors
-#         )
-
-#     pagination_init = PaginationInit(page=page)
-#     result_data = TDArtistListResult(
-#         pagination_init=pagination_init,
-#         name=artist_name
-#     )
-
-#     return ValidationResult(
-#         is_successful=True,
-#         data=result_data,
-#     )
