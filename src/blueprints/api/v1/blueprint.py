@@ -66,9 +66,11 @@ def list_artists(page: str):
         response = make_response(jsonify(api_response), 422)
         return response
 
+    search_params: TDArtistsParams = request.args.to_dict()
+    service = search_params.get("service")
     current_page = parse_int(page)
     limit = DEFAULT_PAGE_LIMIT
-    artist_count = count_artists()
+    artist_count = count_artists(service)
     total_pages = math.floor(artist_count / limit) + 1
     is_valid_page = current_page and current_page <= total_pages
 
@@ -78,7 +80,6 @@ def list_artists(page: str):
 
         return redirect(redirect_url)
 
-    search_params: TDArtistsParams = request.args.to_dict()
     is_last_page = current_page == total_pages
     pagination_init = TDPaginationInit(
         current_page=current_page,
@@ -94,7 +95,7 @@ def list_artists(page: str):
         offset=offset,
         sql_limit=sql_limit
     )
-    artists = get_artists(pagination_db, search_params.get("service"))
+    artists = get_artists(pagination_db, service)
     pagination = TDPagination(
         total_count=artist_count,
         total_pages=total_pages,

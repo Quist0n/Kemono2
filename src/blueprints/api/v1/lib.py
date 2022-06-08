@@ -20,9 +20,22 @@ construct_artists_key = create_key_constructor("artists")
 construct_artists_count_key = create_counts_key_constructor("artists")
 
 
-def count_artists(reload: bool = False) -> int:
+def validate_artists_request(req: Request):
+    errors = []
+    args_dict: TDArtistsParams = req.args.to_dict()
+    service = args_dict.get("service", "").strip()
+
+    if (service and service not in paysite_list):
+        errors.append("Not a valid service")
+
+    return errors
+
+
+def count_artists(service: str = None, reload: bool = False) -> int:
     redis = get_conn()
-    redis_key = "counts:artists"
+    redis_key = construct_artists_count_key(
+        *("service", service) if service else ""
+    )
     artist_count = redis.get(redis_key)
     result = None
 
@@ -37,30 +50,23 @@ def count_artists(reload: bool = False) -> int:
         return count_artists(reload=reload)
 
     cursor = get_cursor()
-    query = """
+    query_args = dict(
+        service=service
+    )
+    query = f"""
         SELECT COUNT(*) as artist_count
         FROM lookup
         WHERE
             service != 'discord-channel'
+            {"AND service = %(service)s" if service else ""}
     """
-    cursor.execute(query)
+    cursor.execute(query, query_args)
     result = cursor.fetchone()
     artist_count: int = result['artist_count']
     redis.set(redis_key, str(artist_count), ex=600)
     lock.release()
 
     return artist_count
-
-
-def validate_artists_request(req: Request):
-    errors = []
-    args_dict: TDArtistsParams = req.args.to_dict()
-    service = args_dict.get("service", "").strip()
-
-    if (service and service not in paysite_list):
-        errors.append("Not a valid service")
-
-    return errors
 
 
 def get_artists(
@@ -100,7 +106,7 @@ def get_artists(
         FROM lookup
         WHERE
             service != 'discord-channel'
-            {"AND service = %(service)" if service else ""}
+            {"AND service = %(service)s" if service else ""}
         ORDER BY
             indexed ASC,
             name ASC,
