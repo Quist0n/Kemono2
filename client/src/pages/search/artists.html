@@ -22,23 +22,25 @@
       )
     ] + g.paysite_options %}
 
-    {{ input_text(
-      id="search-artist-name",
-      name="name",
-      title="Name:"
-    ) }}
-
     {% call fieldset(class="form__fieldset--optional") %}
       {{ form_button(
         title="More options",
         class="form__more"
       ) }}
+
+      {{ input_text(
+      id="search-artist-name",
+      name="name",
+      title="Name:"
+      ) }}
+
       {{ input_select(
         id="search-artists-service",
         name="service",
         title="Paywall:",
         options=options
       ) }}
+
       {{ form_button(
         title="Less options",
         class="form__less"

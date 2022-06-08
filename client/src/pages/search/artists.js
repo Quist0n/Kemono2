@@ -44,7 +44,7 @@ export async function searchArtistsPage(section) {
    */
   const artistList = cardList.querySelector(".card-list__items");
 
-  initSearchForm(searchForm, artistList, state)
+  initSearchForm(searchForm, artistList, state);
 }
 
 /**
@@ -60,21 +60,21 @@ function initSearchForm(form, artistList, state) {
      * @type {HTMLButtonElement}
      */
     const button = event.target;
-    const more = button.closest(".form__more")
-    const less = button.closest(".form__less")
+    const more = button.closest(".form__more");
+    const less = button.closest(".form__less");
 
     if (!more && !less) {
-      return
+      return;
     }
 
     if (more) {
-      optionalFieldset.classList.toggle("form__fieldset--more", true)
+      optionalFieldset.classList.toggle("form__fieldset--more", true);
 
-      return
+      return;
     }
 
-    optionalFieldset.classList.toggle("form__fieldset--more", false)
-  })
+    optionalFieldset.classList.toggle("form__fieldset--more", false);
+  });
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -85,7 +85,7 @@ function initSearchForm(form, artistList, state) {
 
     try {
       state.isLoading = true;
-      form.classList.add("form--submitting")
+      form.classList.add("form--submitting");
       /**
        * @type {HTMLSelectElement}
        */
@@ -110,7 +110,7 @@ function initSearchForm(form, artistList, state) {
       alert(error);
     } finally {
       state.isLoading = false;
-      form.classList.remove("form--submitting")
+      form.classList.remove("form--submitting");
     }
   });
 }
@@ -170,6 +170,12 @@ async function renderPage({ data, artistList, state }) {
     }
   });
   const artistCards = document.createDocumentFragment();
+  const oldPaginatorTop =
+    artistList.previousElementSibling
+      && artistList.previousElementSibling.classList.contains("paginator-client")
+      ? artistList.previousElementSibling
+      : undefined;
+  const oldPaginatorBottom = artistList.nextElementSibling;
 
   for await (const artist of artists) {
     const card = UserCard(null, artist);
@@ -182,7 +188,15 @@ async function renderPage({ data, artistList, state }) {
     artistCards.appendChild(card);
   }
 
+
   artistList.replaceChildren(artistCards);
+
+  if (oldPaginatorTop) {
+    oldPaginatorTop.replaceWith(paginatorTop);
+    oldPaginatorBottom.replaceWith(paginatorBottom);
+    return;
+  }
+
   artistList.insertAdjacentElement("beforebegin", paginatorTop);
   artistList.insertAdjacentElement("afterend", paginatorBottom);
 }
