@@ -1,8 +1,9 @@
 {% extends "components/shell.html" %}
 
 {% import 'components/site.html' as site %}
-{% from 'components/forms/base.html' import form %}
+{% from 'components/forms/base.html' import form, fieldset %}
 {% from 'components/forms/inputs.html' import input_text, input_select %}
+{% from 'components/forms/buttons.html' import form_button %}
 {% from 'components/image_link.html' import image_link %}
 {% from 'components/card_list.html' import card_list %}
 {% from 'components/cards/user.html' import user_card_skeleton %}
@@ -24,16 +25,25 @@
     {{ input_text(
       id="search-artist-name",
       name="name",
-      title="Name"
+      title="Name:"
     ) }}
 
-    {{ input_select(
-      id="search-artists-service",
-      name="service",
-      title="Paysite",
-      options=options
-    ) }}
-
+    {% call fieldset(class="form__fieldset--optional") %}
+      {{ form_button(
+        title="More options",
+        class="form__more"
+      ) }}
+      {{ input_select(
+        id="search-artists-service",
+        name="service",
+        title="Paywall:",
+        options=options
+      ) }}
+      {{ form_button(
+        title="Less options",
+        class="form__less"
+      ) }}
+    {% endcall %}
   {% endcall %}
 
   {% call card_list('table') %}

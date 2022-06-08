@@ -6,6 +6,11 @@
 {%- endmacro -%}
 
 {# call-only macro #}
+{% macro fieldset() %}
+  <fieldset{{ attributes('form__fieldset', **kwargs) }} >{{ caller()}}</fieldset>
+{% endmacro %}
+
+{# call-only macro #}
 {% macro form_section() -%}
   <div {{ attributes('form__section', **kwargs) }}>{{ caller()}}
   </div>

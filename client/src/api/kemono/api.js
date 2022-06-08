@@ -92,9 +92,10 @@ async function bannedArtist(id, service) {
 /**
  * @param {number} [page]
  * @param {string} [service]
+ * @param {string} [name]
  * @returns {Promise<IArtistsAPIResponse>}
  */
-async function artists(page, service) {
+async function artists(page, service, name) {
   const path = page
     ? `/api/v1/artists/${page}`
     : "/api/v1/artists";
@@ -103,6 +104,10 @@ async function artists(page, service) {
 
   if (service) {
     searchParams.set("service", service);
+  }
+
+  if (name) {
+    searchParams.set("name", name);
   }
 
   const url = Array.from(searchParams.keys()).length

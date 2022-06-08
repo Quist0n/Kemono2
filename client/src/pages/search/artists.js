@@ -44,7 +44,39 @@ export async function searchArtistsPage(section) {
    */
   const artistList = cardList.querySelector(".card-list__items");
 
-  searchForm.addEventListener("submit", async (event) => {
+  initSearchForm(searchForm, artistList, state)
+}
+
+/**
+ * @param {HTMLFormElement} form
+ * @param {HTMLUListElement} artistList
+ * @param {IState} state
+ */
+function initSearchForm(form, artistList, state) {
+  const optionalFieldset = form.querySelector(".form__fieldset--optional");
+
+  optionalFieldset.addEventListener("click", (event) => {
+    /**
+     * @type {HTMLButtonElement}
+     */
+    const button = event.target;
+    const more = button.closest(".form__more")
+    const less = button.closest(".form__less")
+
+    if (!more && !less) {
+      return
+    }
+
+    if (more) {
+      optionalFieldset.classList.toggle("form__fieldset--more", true)
+
+      return
+    }
+
+    optionalFieldset.classList.toggle("form__fieldset--more", false)
+  })
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (state.isLoading) {
@@ -53,11 +85,7 @@ export async function searchArtistsPage(section) {
 
     try {
       state.isLoading = true;
-
-      /**
-       * @type {HTMLFormElement}
-       */
-      const form = event.target;
+      form.classList.add("form--submitting")
       /**
        * @type {HTMLSelectElement}
        */
@@ -82,6 +110,7 @@ export async function searchArtistsPage(section) {
       alert(error);
     } finally {
       state.isLoading = false;
+      form.classList.remove("form--submitting")
     }
   });
 }
@@ -101,8 +130,8 @@ async function renderPage({ data, artistList, state }) {
       try {
         state.isLoading = true;
         /**
-       * @type {import("api/kemono/api.js").IArtistsAPIResponse}
-       */
+         * @type {import("api/kemono/api.js").IArtistsAPIResponse}
+         */
         const { data } = await kemonoAPI.api.artists(page, state.service, state.artist_name);
         paginatorTop.remove();
         paginatorBottom.remove();
