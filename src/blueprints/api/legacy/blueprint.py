@@ -1,6 +1,10 @@
-from flask import Blueprint, request, redirect, url_for, make_response, jsonify
+from typing import List
 
+from flask import Blueprint, jsonify, make_response, redirect, request, url_for
+
+from src.blueprints.api.v1.types import TDArtist
 from src.internals.database.database import get_cursor
+
 legacy_api = Blueprint('legacy_api', __name__)
 
 
@@ -16,7 +20,16 @@ def creators():
     # new_url = url_for('api.v1.list_artists', **request.args)
     # return redirect(new_url, 301)
     cursor = get_cursor()
-    query = "SELECT * FROM lookup WHERE service != 'discord-channel'"
+    query = """
+        SELECT id, indexed, name, service, updated
+        FROM lookup
+            WHERE service != 'discord-channel'
+        ORDER BY
+            indexed ASC,
+            name ASC,
+            service ASC
+    """
     cursor.execute(query)
-    results = cursor.fetchall()
-    return make_response(jsonify(results), 200)
+    artists: List[TDArtist] = cursor.fetchall()
+
+    return make_response(jsonify(artists), 200)
