@@ -1,5 +1,5 @@
-export { KemonoError } from "./kemono-error";
 export { paysiteList, paysites } from "./paysites.js";
+export { KemonoError, KemonoAPIError, KemonoValidationError } from "./kemono-error/_index.js";
 
 const defaultDelay = parseInt(document.documentElement.style.getPropertyValue("--duration-global"));
 
@@ -111,4 +111,11 @@ export const freesites = {
  */
 export function waitAsync(time) {
   return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+/**
+ * @param {string} str
+ */
+export function isLowerCase(str) {
+  return Boolean(str.match(/[0-9a-z]+/i));
 }
