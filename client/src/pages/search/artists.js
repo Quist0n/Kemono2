@@ -1,4 +1,4 @@
-import { kemonoAPI } from "@wp/api";
+import { fetchArtists } from "@wp/api";
 import { PaginatorClient, UserCard } from "@wp/components";
 import { findFavouriteArtist } from "@wp/js/favorites";
 
@@ -98,10 +98,7 @@ function initSearchForm(form, artistList, state) {
       const nameInput = form.elements["name"];
       const name = nameInput.value.trim().toLowerCase();
 
-      /**
-       * @type {import("api/kemono/api.js").IArtistsAPIResponse}
-       */
-      const { data } = await kemonoAPI.api.artists(state.currentPage, service, name);
+      const { data } = await fetchArtists(state.currentPage, service, name);
       state.service = service;
       state.artist_name = name;
 
@@ -129,10 +126,8 @@ async function renderPage({ data, artistList, state }) {
 
       try {
         state.isLoading = true;
-        /**
-         * @type {import("api/kemono/api.js").IArtistsAPIResponse}
-         */
-        const { data } = await kemonoAPI.api.artists(page, state.service, state.artist_name);
+
+        const { data } = await fetchArtists(page, state.service, state.artist_name);
         paginatorTop.remove();
         paginatorBottom.remove();
         renderPage({ data, artistList, state });
@@ -152,10 +147,8 @@ async function renderPage({ data, artistList, state }) {
 
       try {
         state.isLoading = true;
-        /**
-         * @type {import("api/kemono/api.js").IArtistsAPIResponse}
-         */
-        const { data } = await kemonoAPI.api.artists(page, state.service, state.artist_name);
+
+        const { data } = await fetchArtists(page, state.service, state.artist_name);
         paginatorTop.remove();
         paginatorBottom.remove();
         const { left, top } = artistList.getBoundingClientRect();

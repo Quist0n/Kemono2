@@ -15,7 +15,7 @@ def api_list():
 
 
 # @TODO: deprecate once server name search is in place
-@legacy_api.route('/api/creators')
+@legacy_api.route('/creators')
 def creators():
     # new_url = url_for('api.v1.list_artists', **request.args)
     # return redirect(new_url, 301)

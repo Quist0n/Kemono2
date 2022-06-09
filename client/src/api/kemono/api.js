@@ -110,13 +110,15 @@ export async function fetchArtists(page, service, name) {
   if (!artistList) {
     artistList = await creators();
   }
-
+  console.log(service, name);
   const filteredArtists = service || name
     ? artistList.filter(
       (artist) => {
-        const isService = service ? artist.service === service : true;
+        const isService = service
+          ? artist.service === service
+          : true;
         const isName = name
-          ? artist.name.startsWith(name) || artist.id.startsWith(name)
+          ? artist.name.toLowerCase().includes(name) || artist.id.toLowerCase().includes(name)
           : true;
         const isEligible = isService && isName;
         return isEligible;
