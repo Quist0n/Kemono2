@@ -96,7 +96,7 @@ function initSearchForm(form, artistList, state) {
        * @type {HTMLInputElement}
        */
       const nameInput = form.elements["name"];
-      const name = nameInput.value;
+      const name = nameInput.value.trim().toLowerCase();
 
       /**
        * @type {import("api/kemono/api.js").IArtistsAPIResponse}
