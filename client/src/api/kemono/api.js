@@ -89,13 +89,76 @@ async function bannedArtist(id, service) {
  * @property {IArtistsAPIBody} data
  */
 
+const DEFAULT_PAGE_LIMIT = 25;
+/**
+ * @type {IArtist[]}
+ */
+let artistList = undefined;
+
 /**
  * @param {number} [page]
  * @param {string} [service]
- * @param {string} [name]
+ * @param {string} [name] Assumed to be stripped and formatted already.
  * @returns {Promise<IArtistsAPIResponse>}
  */
-async function artists(page, service, name) {
+export async function fetchArtists(page, service, name) {
+  if (!name && !artistList) {
+    const response = await artists(page, service);
+    return response;
+  }
+
+  if (!artistList) {
+    artistList = await creators();
+  }
+
+  const filteredArtists = service || name
+    ? artistList.filter(
+      (artist) => {
+        const isService = service ? artist.service === service : true;
+        const isName = name
+          ? artist.name.startsWith(name) || artist.id.startsWith(name)
+          : true;
+        const isEligible = isService && isName;
+        return isEligible;
+      }
+    )
+    : artistList;
+  const limit = DEFAULT_PAGE_LIMIT;
+  const totalCount = filteredArtists.length;
+  const totalPages = Math.floor(totalCount / limit) + 1;
+  const currentPage = page ? page : totalPages;
+  const offset = (currentPage - 1) * DEFAULT_PAGE_LIMIT;
+  /**
+   * @type {IPagination}
+   */
+  const pagination = {
+    current_page: currentPage,
+    limit: limit,
+    total_count: totalCount,
+    total_pages: totalPages
+  };
+  const artistsPage = filteredArtists.slice(offset, offset + limit);
+
+  /**
+   * @type {IArtistsAPIResponse}
+   */
+  const response = {
+    is_successful: true,
+    data: {
+      pagination,
+      artists: artistsPage
+    }
+  };
+
+  return response;
+}
+
+/**
+ * @param {number} [page]
+ * @param {string} [service]
+ * @returns {Promise<IArtistsAPIResponse>}
+ */
+async function artists(page, service,) {
   const path = page
     ? `/api/v1/artists/${page}`
     : "/api/v1/artists";
@@ -104,10 +167,6 @@ async function artists(page, service, name) {
 
   if (service) {
     searchParams.set("service", service);
-  }
-
-  if (name) {
-    searchParams.set("name", name);
   }
 
   const url = Array.from(searchParams.keys()).length
@@ -152,6 +211,9 @@ async function creators() {
   }
 }
 
+/**
+ * @param {string} importID
+ */
 async function logs(importID) {
   try {
     const response = await kemonoFetch(`/api/logs/${importID}`, { method: "GET" });
