@@ -19,7 +19,7 @@ export function PaginatorClient({ pagination, onPageChange }) {
   const isLastPage = current_page === total_pages;
   const currentMin = (current_page - 1) * limit;
   const currentMax = isLastPage ? total_count : currentMin + limit;
-  const info = `Viewing ${currentMin}-${currentMax} out of ${total_count} items.`;
+  const info = `${currentMin}-${currentMax} out of ${total_count}`;
 
   /**
    * @type {HTMLDivElement}
