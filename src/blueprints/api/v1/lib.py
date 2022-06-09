@@ -28,9 +28,9 @@ construct_artists_count_key = create_counts_key_constructor("artists")
 
 def validate_artists_request(req: Request) -> Union[TDValidationFailure, TDValidationSuccess]:
     errors = []
-    args_dict: TDArtistsParams = req.args.to_dict()
+    args_dict = req.args.to_dict()
     service = args_dict.get("service", "").strip()
-    name = args_dict.get("name", "").strip()
+    # name = args_dict.get("name", "").strip()
 
     if (service and service not in paysite_list):
         errors.append("Not a valid service")
@@ -45,7 +45,7 @@ def validate_artists_request(req: Request) -> Union[TDValidationFailure, TDValid
 
     validated_params = TDArtistsParams(
         service=service,
-        name=name
+        # name=name
     )
     result = TDValidationSuccess(
         is_successful=True,
@@ -57,14 +57,14 @@ def validate_artists_request(req: Request) -> Union[TDValidationFailure, TDValid
 
 def count_artists(
     service: str = None,
-    name: str = None,
+    # name: str = None,
     reload: bool = False
 ) -> int:
     redis = get_conn()
-    encoded_name = encode_text_query(name)
+    # encoded_name = encode_text_query(name)
     redis_key = construct_artists_count_key(
         *("service", service) if service else "",
-        *("name", encoded_name) if name else ""
+        # *("name", encoded_name) if name else ""
     )
     artist_count = redis.get(redis_key)
     result = None
@@ -77,13 +77,19 @@ def count_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return count_artists(service, name, reload=reload)
+        return count_artists(
+            service,
+            # name,
+            reload=reload
+        )
 
     cursor = get_cursor()
     query_args = dict(
         service=service,
-        name=name
+        # name=name
     )
+
+    # name_query = f"AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)" if name else ""
 
     query = f"""
         SELECT COUNT(*) as artist_count
@@ -91,7 +97,6 @@ def count_artists(
         WHERE
             service != 'discord-channel'
             {"AND service = %(service)s" if service else ""}
-            {"AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)" if name else ""}
     """
     cursor.execute(query, query_args)
     result = cursor.fetchone()
@@ -105,7 +110,7 @@ def count_artists(
 def get_artists(
     pagination_db: TDPaginationDB,
     service: str = None,
-    name: str = None,
+    # name: str = None,
     reload: bool = False
 ) -> List[TDArtist]:
     """
@@ -113,10 +118,10 @@ def get_artists(
     @TODO return dataclass
     """
     redis = get_conn()
-    encoded_name = encode_text_query(name)
+    # encoded_name = encode_text_query(name)
     redis_key = construct_artists_key(
         *("service", service) if service else "",
-        *("name", encoded_name) if name else "",
+        # *("name", encoded_name) if name else "",
         str(pagination_db["pagination_init"]["current_page"])
     )
 
@@ -129,15 +134,22 @@ def get_artists(
 
     if not lock.acquire(blocking=False):
         time.sleep(0.1)
-        return get_artists(pagination_db, service, name, reload=reload)
+        return get_artists(
+            pagination_db,
+            service,
+            # name,
+            reload=reload
+        )
 
     cursor = get_cursor()
     arg_dict = dict(
         offset=pagination_db["offset"],
         limit=pagination_db["sql_limit"],
         service=service,
-        name=name
+        # name=name
     )
+    # name_query = f"AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)" if name else ""
+
     query = f"""
         SELECT id, indexed, name, service, updated
         FROM lookup
@@ -146,10 +158,6 @@ def get_artists(
             {
                 "AND service = %(service)s"
                 if service
-                else ""}
-            {
-                "AND to_tsvector('english', name) @@ websearch_to_tsquery(%(name)s)"
-                if name
                 else ""
             }
         ORDER BY
